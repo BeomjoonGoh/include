@@ -1,0 +1,5 @@
+# Input parameters
+beta          100       # Inverse temperature
+U             2.0       # Coulomb repulsion
+Niom          1000      # Number of Matsubara frequency
+logfile       log.txt   # Log file name
