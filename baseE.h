@@ -1,4 +1,3 @@
-// 17 Oct 2018 16:07:38 -0400
 #ifndef BASEE_H
 #define BASEE_H
 
