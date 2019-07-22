@@ -47,7 +47,7 @@ class ParamSet
     bool readbefore;
   public:
     ParamSet(const std::initializer_list<ParamBase*> &l) : PS(l), readbefore(false) { }
-    ~ParamSet() { } 
+    ~ParamSet() { }
 
     void Log(std::ostream &os, const std::string &name);
     void Read(const std::string &inputf, char delim = '\0');
@@ -74,11 +74,8 @@ void Param<T>::read(std::istream &is, const std::string &s, char delim)
   const int ssMax = 2000;
   if (s == name) {
     assigned = true;
-    if (delim == '\0') {
-      is >> value;
-    } else {
-      is.ignore(ssMax,delim) >> value;
-    }
+    if (delim == '\0') is >> value;
+    else               is.ignore(ssMax,delim) >> value;
   }
 }
 template <>
@@ -88,11 +85,8 @@ void Param<bool>::read(std::istream &is, const std::string &s, char delim)
   if (s == name) {
     assigned = true;
     std::string sTF;
-    if (delim == '\0') {
-      is >> sTF;
-    } else {
-      is.ignore(ssMax,delim) >> sTF;
-    }
+    if (delim == '\0') is >> sTF;
+    else               is.ignore(ssMax,delim) >> sTF;
     std::transform(sTF.begin(), sTF.end(), sTF.begin(), ::tolower);
     std::istringstream(sTF) >> std::boolalpha >> value;
   }
@@ -143,9 +137,8 @@ template <typename T>
 std::ostream& operator<< (std::ostream &os, const std::vector<T> &v)
 {
   os << "( ";
-  for (auto &i : v) {
+  for (auto &i : v)
     os << i << " ";
-  }
   os << ")";
   return os;
 }
@@ -154,9 +147,8 @@ template <typename T, typename U>
 std::ostream& operator<< (std::ostream &os, const std::map<T,U> &m)
 {
   os << "{ ";
-  for (auto &i : m) {
+  for (auto &i : m)
     os << i.first << " : " << i.second << ", ";
-  }
   os << "}";
   return os;
 }
