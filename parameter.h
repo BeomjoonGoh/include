@@ -50,7 +50,7 @@ class ParamSet
     ~ParamSet() { }
 
     void Log(std::ostream &os, const std::string &name);
-    void Read(const std::string &inputf, char delim = '\0');
+    bool Read(const std::string &inputf, char delim = '\0');
 };
 
 template <typename T> std::ostream& operator<< (std::ostream &os, const std::vector<T> &v);
@@ -107,16 +107,16 @@ void ParamSet::Log(std::ostream &os, const std::string &name)
   os << "============================================================\n";
 }
 
-void ParamSet::Read(const std::string &inputf, char delim)
+bool ParamSet::Read(const std::string &inputf, char delim)
 {
   if (readbefore) {
     std::cerr << "Don't read more than once!\n";
-    return;
+    return true;
   }
   std::ifstream inf(inputf);
   if (!inf.good()) {
     std::clog << "Missing input file! " << "No " << inputf << ". Proceeds only with default values.\n";
-    return;
+    return false;
   }
   readbefore = true;
   const int ssMax = 2000;
@@ -130,6 +130,7 @@ void ParamSet::Read(const std::string &inputf, char delim)
       p->read(inf, strInput, delim);
     }
   }
+  return true;
 }
 
 // operator <<,>> for vector and map
