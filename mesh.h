@@ -8,6 +8,7 @@
 #include "maths.h"
 #include "assert.h"
 #include "zeroin.h"
+#include "util.h"
 
 class M1d;
 class AddLogTan;
@@ -51,6 +52,7 @@ class M1d
     void Set();
 
     void makeEqDist(int N_, double a, double b);
+    void makeTan   (int N_, double dx, double x1); // [-x1, x1]
     void makeLogTan(int N_, double x0, double x1, double x2, double alpha); // [x0, x2)
 
     void makeEqLogTan    (int N_, double x0, double x1, double x2, double alpha); // (-x2 ~ x2)
@@ -80,7 +82,7 @@ class M1d
 };
 
 class AddLogTan
-{ // functor class for adding std::log mesh and std::tan mesh using zeroin.
+{ // functor class for adding log mesh and tan mesh using zeroin.
   private:
     double dwt, xt;
   public:
@@ -181,6 +183,22 @@ inline void M1d::makeEqDist(int N_, double a, double b)
   }
   Set();
 }
+inline void M1d::makeTan(int N_, double dx, double x1)
+{ // x \in [-x1, x1]
+  // Note: 0.0 is (not) included if N is (even) odd
+  resize(N_);
+  double piN = Maths::pi/N;
+  double dxx1 = dx/x1;
+  auto f = [&](double d) { return std::tan(d)*std::tan(piN-2.0*d/N) - dxx1; };
+  double d = zeroin(1e-7, Maths::pi/2.0 - 1e-7, f, 1e-15);
+  double w = x1*std::tan(d);
+  double a = Maths::pi/2.0-d;
+
+  for (int i = 0; i < N; i++)
+    x[i] = w*std::tan(a*(2.0*i/(N-1) - 1.0));
+  Set();
+}
+
 inline void M1d::makeLogTan(int N_, double x0, double x1, double x2, double alpha)
 { // x \in [x0, x2), x0 > 0
   //  1) x0 ~ x1 : logarithm mesh,
@@ -193,9 +211,8 @@ inline void M1d::makeLogTan(int N_, double x0, double x1, double x2, double alph
   double eta = Dlogx/(x2/x1-1);
   double N1_min = (1+eta*N)/(1+eta)+0.5;
   int N1 = static_cast<int>((1+alpha)*N1_min);
-  if (N1 > N-2) {
+  if (N1 > N-2)
     N1 = N-2;
-  }
   
   int N2 = N-N1;
   double xt = x2/x1;
