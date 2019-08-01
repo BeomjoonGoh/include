@@ -625,7 +625,7 @@ void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
     if (p2 > p3) {
       // find the interval which contains p2
       for (; (j < X1.size() && p2 > X1[j]); j++);
-      if (p2 < X1[j]) j--;
+      if (p2 < X1[j] || j == X1.size()-1) j--;
       p1 = X1[j];                     // update left endpoint
       p3 = X1[j+1];                   // update right endpoint
 
