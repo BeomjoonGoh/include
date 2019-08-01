@@ -55,7 +55,7 @@ class M1d
     void makeTan   (int N_, double dx, double x1); // [-x1, x1]
     void makeLogTan(int N_, double x0, double x1, double x2, double alpha); // [x0, x2)
 
-    void makeEqLogTan    (int N_, double x0, double x1, double x2, double alpha); // (-x2 ~ x2)
+    void makeEqLogTan    (int N_, double x0, double x1, double x2, double alpha); // [-x2 ~ x2]
     void makePosEqLogTan (int N_, double x0, double x1, double x2, double alpha); // (0.0 ~ x2)
 
     void makeEqLogTan0   (int N_, double x0, double x1, double x2, double alpha); // (-x2 ~ 0 ~ x2) 
@@ -194,8 +194,10 @@ inline void M1d::makeTan(int N_, double dx, double x1)
   double w = x1*std::tan(d);
   double a = Maths::pi/2.0-d;
 
-  for (int i = 0; i < N; i++)
+  x[0] = -x1;
+  for (int i = 1; i < N-1; i++)
     x[i] = w*std::tan(a*(2.0*i/(N-1) - 1.0));
+  x[N-1] = x1;
   Set();
 }
 
@@ -302,8 +304,7 @@ inline void M1d::makePosEqLogTan(int N_, double x0, double x1, double x2, double
   double w = x1/std::tan(a);
 
   for (int i = 0; i < N0; i++)
-    //x[i] = i*x0/N0;
-    x[i] = (2*i+1)*x0/(2*N0+1);
+  k x[i] = (2*i+1)*x0/(2*N0+1);
   for (int i = 0; i < N1; i++)
     x[N0+i] = x0*std::exp(i*Dlogx/(N1-1));
   for (int i = 0; i < N2; i++)
@@ -323,17 +324,15 @@ inline void M1d::makeEqLogTan0(int N_, double x0, double x1, double x2, double a
   std::copy(x,x+n,tmp);
 
   resize(N_);
-  for (int i = 0; i < n-1; i++) {
+  for (int i = 0; i < n-1; i++)
     x[i] = -tmp[n-1-i];
-  }
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
     x[n-1+i] = tmp[i];
-  }
   delete[] tmp;
   Set();
 }
 inline void M1d::makeEqLogTan(int N_, double x0, double x1, double x2, double alpha)
-{ // x \in (-x2, x2)
+{ // x \in [-x2, x2]
   //  1) -x0 ~  x0 : equi-distance mesh,
   //  2) |x0 ~ x1| : logarithm mesh,
   //  3) |x1 ~ x2| : tangent mesh
@@ -343,6 +342,7 @@ inline void M1d::makeEqLogTan(int N_, double x0, double x1, double x2, double al
 
   double *tmp = new double[n];
   std::copy(x,x+n,tmp);
+  tmp[n-1] = x2;
 
   resize(n<<1);
   for (int i = 0; i < n; i++) {
