@@ -91,7 +91,7 @@ double Ellip::Rf(const double x_, const double y_, const double z_)
     -0.06818181818181818, // -3/44
      0.07142857142857142  //  1/14
   };
-  assert(Maths::min(Maths::min(x_,y_),z_) >= 0.0, "x,y,z="<<x<<","<<y<<","<<z<<" must be non-negative.");
+  assert(Maths::min(Maths::min(x_,y_),z_) >= 0.0, "x,y,z="<<x_<<","<<y_<<","<<z_<<" must be non-negative.");
   assert(Maths::doubleMin*5.0 <= Maths::min(Maths::min(x_+y_,x_+z_),y_+z_)
          && Maths::max(Maths::max(x_,y_),z_) <= Maths::doubleMax/5.0,
          "Arguments must be in range of double.");
@@ -126,7 +126,7 @@ double Ellip::Rd(const double x_, const double y_, const double z_)
      0.10227272727272727, //  9/88
     -0.17307692307692307  // -9/52
   };
-  assert(Maths::min(x_,y_) >= 0.0, "x,y="<<x<<","<<y<<" must be non-negative.");
+  assert(Maths::min(x_,y_) >= 0.0, "x,y="<<x_<<","<<y_<<" must be non-negative.");
   assert(2.0*std::pow(Maths::doubleMax,-2.0/3.0) <= Maths::min(x_+y_,z_)
          && Maths::max(Maths::max(x_,y_),z_) <= 0.1*Tol*std::pow(Maths::doubleMin,-2.0/3.0),
          "Arguments must be in range of double.");
@@ -171,7 +171,7 @@ double Ellip::Rj(const double x_, const double y_, const double z_, const double
      0.16666666666666667, //  1/6
     -0.27272727272727272  // -3/11
   };
-  assert(Maths::min(Maths::min(x_,y_),z_) >= 0.0, "x,y,z="<<x<<","<<y<<","<<z<<" must be non-negative.");
+  assert(Maths::min(Maths::min(x_,y_),z_) >= 0.0, "x,y,z="<<x_<<","<<y_<<","<<z_<<" must be non-negative.");
   assert(std::pow(Maths::doubleMin*5.0, 1.0/3.0) <= Maths::min(Maths::min(x_+y_,x_+z_), Maths::min(y_+z_,Maths::abs(p_)))
          && Maths::max(Maths::max(x_,y_),Maths::max(z_,Maths::abs(p_))) <= 0.3*std::pow(Maths::doubleMax/5.0, 1.0/3.0),
          "Arguments must be in range of double.");
