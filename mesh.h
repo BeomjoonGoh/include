@@ -304,7 +304,7 @@ inline void M1d::makePosEqLogTan(int N_, double x0, double x1, double x2, double
   double w = x1/std::tan(a);
 
   for (int i = 0; i < N0; i++)
-  k x[i] = (2*i+1)*x0/(2*N0+1);
+    x[i] = (2*i+1)*x0/(2*N0+1);
   for (int i = 0; i < N1; i++)
     x[N0+i] = x0*std::exp(i*Dlogx/(N1-1));
   for (int i = 0; i < N2; i++)
@@ -403,7 +403,7 @@ inline int M1d::fInd(double a, int& i) const
 
   i++;
   int iu = N-1;
-  if (i+dN > N){
+  if (i+dN > N) {
     return bisection(a, i, iu);
   }
   if (a < x[i+dN-1]) {
@@ -487,6 +487,8 @@ bool M1d::Read(const std::string &inputf)
     std::clog << "Reading failed: " << inputf << " i(=" << i << ") != N (" << N << ")\n";
     return false;
   }
+  Set();
+
   Util::getComment(inf,inputf);
 
   return true;
