@@ -543,21 +543,6 @@ F1d<T> kramerskronig(const M1d &x, const F1d<T> &f)
     int ip1 = (i < x.size()-1) ? i+1 : i;
     int im1 = (i > 0)    ? i-1 : i;
 
-    //// Somehow below is ~3 times faster...
-    //T atSing = (f[ip1]-f[i])*dxInv[i] + (f[i]-f[im1])*dxInv[im1];
-    //T sum{0.0};
-    //for (int j = 0; j < x.size()-1; j++) {
-    //  int jp1 = (j+1 != i) ? j+1 : j;
-    //  if (j == i) {
-    //    sum += dx*atSing;
-    //  } else {
-    //    if (jp1 == i) sum += dx*2.0*(f[j]-f[i])/(x[j]-x[i]);
-    //    else          sum += dx*((f[j]-f[i])/(x[j]-x[i]) + (f[jp1]-f[i])/(x[jp1]-x[i]));
-    //  }
-    //}
-    //T logVal = (i!=0 && i!=x.size()-1) ? std::log((x.Last()-x[i]) / (x[i]-x.First())) : 0.0;
-    //g[i] = (sum/2.0 + logVal)/pi;
-
     T atSing = 0.5*((f[ip1]-f[i])*x.d1x(i) + (f[i]-f[im1])*dxinv2);
     T sum{0.0};
     for (int j = 0; j < x.size(); j++) {
@@ -595,15 +580,12 @@ inline T integralTZ2(F1d<T> &f, double dx, int i, int j)
 template <typename T>
 template <typename M1d> 
 void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
-{ // Interpolating cubic spline function for irregularly-spaced points.
-  // Assumes that X1,X2 entries are monotonically increasing.
-  //  Input:
-  //      X1      x-coordinates of Y1
-  //      Y1      an array of irregular data points (X1.size() entries)
-  //      X2      an array of x-coordinates of v(output)
-  //  Output:
-  //      v       cubic spline sampled at X2 (X2.size() entries)
-
+{ // Interpolating cubic spline function for irregularly-spaced points. Assumes that X1,X2 entries are monotonically
+  // increasing.
+  //  Input:  X1      x-coordinates of Y1
+  //          Y1      an array of irregular data points (X1.size() entries)
+  //          X2      an array of x-coordinates of v(output)
+  //  Output: v       cubic spline sampled at X2 (X2.size() entries)
   assert(X1.First() <= X2.First() && X2.Last() <= X1.Last(), "Can't extrapolate!");
   assert(X1.size() == Y1.size() && X2.size() == N, "Size matters!");
 
@@ -611,35 +593,27 @@ void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
   F1d<T> YD{X1.size()};
   getYD_gen(X1, Y1, YD);
 
-  // p1 : left endpoint of interval
-  // p2 : resampling position
-  // p3 : right endpoint of interval
-  // j  : input index for current interval
-  double p1{0}, p2{0}, p3{0};
   T A0{0}, A1{0}, A2{0}, A3{0};
-  int i, j;
-  p3 = X2[0] - 1;                     // force coefficient initialization
-  for (i = j = 0; i < X2.size(); i++) {
-    // check if in new interval
-    p2 = X2[i];
-    if (p2 > p3) {
-      // find the interval which contains p2
-      for (; (j < X1.size() && p2 > X1[j]); j++);
-      if (p2 < X1[j] || j == X1.size()-1) j--;
-      p1 = X1[j];                     // update left endpoint
-      p3 = X1[j+1];                   // update right endpoint
+  // p1 : left endpoint of interval
+  // p3 : right endpoint of interval
+  double p1 = X1[0];
+  double p3 = X2[0] - 1;                     // force coefficient initialization
+  int j0 = 0;
+  for (int i = 0; i < X2.size(); i++) {
+    if (X2[i] > p3) {
+      int j = X1.fInd(X2[i], j0);
+      p1 = X1[j];
+      p3 = X1[j+1];
 
       // compute spline coefficients
-      double dx = 1.0 / (X1[j+1] - X1[j]);
-      T dy = (Y1[j+1] - Y1[j]) * dx;
+      T dy = (Y1[j+1] - Y1[j]) * X1.d1x(j);
       A0 = Y1[j];
       A1 = YD[j];
-      A2 = dx*   ( 3.0*dy - 2.0*YD[j] - YD[j+1]);
-      A3 = dx*dx*(-2.0*dy +     YD[j] + YD[j+1]);
+      A2 = X1.d1x(j)*          ( 3.0*dy - 2.0*YD[j] - YD[j+1]);
+      A3 = X1.d1x(j)*X1.d1x(j)*(-2.0*dy +     YD[j] + YD[j+1]);
     }
-
-    // use Horner*s rule to calculate cubic polynomial
-    double x = p2 - p1;
+    // use Horner's rule to calculate cubic polynomial
+    double x = X2[i] - p1;
     v[i] = ((A3*x + A2)*x + A1)*x + A0;
   }
 }
@@ -648,36 +622,31 @@ template <typename T>
 template <typename M1d> 
 void F1d<T>::getYD_gen(const M1d &X, const F1d<T> &Y, F1d<T> &YD)
 { // YD <- Computed 1st derivative of data in X,Y (X.size() entries). The not-a-knot boundary condition is used.
-
   F1d<T> A{X.size()}, B{X.size()}, C{X.size()};
 
-  // init first row data
+  // init tridiagonal bands A, B, C, and column YD. YD will later be used to return the derivatives
   double h0 = X[1] - X[0];
   double h1 = X[2] - X[1];
-  T r0 = (Y[1] - Y[0]) / h0;
-  T r1 = (Y[2] - Y[1]) / h1;
+  T r0 = (Y[1] - Y[0])*X.d1x(0);
+  T r1 = (Y[2] - Y[1])*X.d1x(1);
   B[0] = h1*(h0 + h1);
   C[0] = (h0 + h1)*(h0 + h1);
   YD[0] = r0*(3*h0*h1 + 2*h1*h1) + r1*h0*h0;
 
-  // init tridiagonal bands A, B, C, and column Y0
-  // YD will later be used to return the derivatives
-  int i;
-  for (i = 1; i < X.size()-1; i++) {
+  for (int i = 1; i < X.size()-1; i++) {
     h0 = X[i]- X[i-1];
     h1 = X[i+ 1] - X[i];
-    r0 = (Y[i]- Y[i-1]) / h0;
-    r1 = (Y[i+1]- Y[i]) / h1;
+    r0 = (Y[i] - Y[i-1])*X.d1x(i-1);
+    r1 = (Y[i+1] - Y[i])*X.d1x(i);
     A[i] = h1;
     B[i] = 2*(h0 + h1);
     C[i] = h0;
     YD[i] = 3*(r0*h1 + r1*h0);
   }
 
-  // last row
-  A[i] = (h0 + h1)*(h0 + h1);
-  B[i] = h0*(h0 + h1);
-  YD[i] = r0*h1*h1 + r1*(3*h0*h1 + 2*h0*h0);
+  A[X.size()-1] = (h0 + h1)*(h0 + h1);
+  B[X.size()-1] = h0*(h0 + h1);
+  YD[X.size()-1] = r0*h1*h1 + r1*(3*h0*h1 + 2*h0*h0);
 
   // solve for the tridiagonal matrix: YD=YD*inv(tridiag matrix)
   tridiag_gen(A,B,C,YD);
@@ -685,22 +654,18 @@ void F1d<T>::getYD_gen(const M1d &X, const F1d<T> &Y, F1d<T> &YD)
 template <typename T>
 void F1d<T>::tridiag_gen(const F1d<T> &A, const F1d<T> &B, const F1d<T> &C, F1d<T> &D)
 { // Gauss Elimination with backsubstitution for general tridiagonal matrix with bands A,B,C and column D.
-
-  int len = A.size();
-  F1d<T> F(len);
-
-  // Gauss elimination; forward substitution
+  T *tmp = new T[D.size()];
   T b = B[0];
   D[0] = D[0] / b;
-  int i;
-  for (i = 1; i < len; i++) {
-    F[i] = C[i-1] / b;
-    b = B[i] - A[i]*F[i];
+  for (int i = 1; i < D.size(); i++) {
+    tmp[i] = C[i-1] / b;
+    b = B[i] - A[i]*tmp[i];
     assert(b != 0.0, "Divide by zero");
     D[i] = (D[i] - D[i-1]*A[i]) / b;
   }
-  // backsubstitution
-  for(i = len-2; i >= 0; i--) D[i] -= (D[i+1]*F[i+1]);
+  for (int i = D.size()-1; i-->0;)
+    D[i] -= (D[i+1]*tmp[i+1]);
+  delete[] tmp;
 }
 
 template <typename T>
