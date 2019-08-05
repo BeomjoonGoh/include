@@ -585,6 +585,7 @@ void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
   //  Input:  X1      x-coordinates of Y1
   //          Y1      an array of irregular data points (X1.size() entries)
   //          X2      an array of x-coordinates of v(output)
+  //
   //  Output: v       cubic spline sampled at X2 (X2.size() entries)
   assert(X1.First() <= X2.First() && X2.Last() <= X1.Last(), "Can't extrapolate!");
   assert(X1.size() == Y1.size() && X2.size() == N, "Size matters!");
