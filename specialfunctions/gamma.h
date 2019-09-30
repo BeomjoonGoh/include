@@ -66,6 +66,7 @@ inline double Gamma::logG(const double x)
 inline double Gamma::factorial(const int n)
 { // Returns the value n! as a floating-point number.
   static const int NTOP = 171; // 171! overflows.
+  assert(n >= 0 && n < NTOP, "factorial out of range (NTOP=171), n="<<n);
   static double a[NTOP];
   static bool init = true;
   if (init) {
@@ -74,12 +75,12 @@ inline double Gamma::factorial(const int n)
     for (int i = 1; i < NTOP; i++)
       a[i] = i*a[i-1];
   }
-  assert(n >= 0 && n < NTOP, "factorial out of range (NTOP=171), n="<<n);
   return a[n];
 }
 
 inline double Gamma::logFactorial(const int n)
 { // Returns ln(n!).
+  assert0(n >= 0);
   static const int NTOP=2000; // can be increased but necessary?
   static double a[NTOP];
   static bool init = true;
@@ -88,7 +89,6 @@ inline double Gamma::logFactorial(const int n)
     for (int i = 0; i < NTOP; i++)
       a[i] = logG(i+1.);
   }
-  assert0(n >= 0);
   return (n < NTOP) ? a[n] : logG(n+1.0);
 }
 
@@ -98,7 +98,7 @@ inline double Gamma::beta(const double z, const double w)
 }
 
 inline double Gamma::P(const double a, const double x)
-{ // Returns the incomplete gamma function P(a,x) = 
+{ // Returns the incomplete gamma function P(a,x) =
   assert(x >= 0.0 && a < 0.0, "x,a="<<x<<","<<a);
   if (x == 0.0)
     return 0.0;
@@ -139,7 +139,7 @@ inline double Gamma::PseriseExpansion(const double a, const double x)
 }
 
 inline double Gamma::QcontinuedFraction(const double a, const double x)
-{ // Returns the incomplete gamma function Q(a,x) evalutated by its continued fraction representation. 
+{ // Returns the incomplete gamma function Q(a,x) evalutated by its continued fraction representation.
   double b = x + 1.0 - a;
   double c = 1.0/Fmin;
   double d = 1.0/b;
@@ -228,7 +228,7 @@ inline double Gamma::invP(const double p, const double a)
     if (x <= 0.)
       x = 0.5*(x + t); // Halve old value if x tries to go negative.
 
-    if (Maths::abs(t) < EPS*x ) break;
+    if (Maths::abs(t) < EPS*x) break;
   }
   return x;
 }
@@ -275,6 +275,5 @@ const double Gauleg18::GLw[Gauleg18::ngau] = {
 };
 
 const double Gamma::Fmin = Maths::doubleMin/Maths::absEpsilon;
-
 
 #endif /* end of include guard: GAMMA_H */

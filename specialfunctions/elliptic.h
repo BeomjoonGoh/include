@@ -32,7 +32,7 @@ class Ellip
     static double complete1(const double k);
     static double complete2(const double k);
     static double complete3(const double n, const double k);
-  
+
     static double Rf(const double x, const double y, const double z);
     static double Rd(const double x, const double y, const double z);
     static double Rj(const double x, const double y, const double z, const double p);
@@ -224,7 +224,7 @@ double Ellip::Rj(const double x_, const double y_, const double z_, const double
 
   double R = 3.0*sum + fac*(1.0 + Ea*P*(C[1] + P*C[2]) + Eb*(C[6] + P*(C[7] + P*C[3]))
                                 - Ec*P*C[1] + Ed*(C[0] + C[4]*Ed + C[5]*Ee))/(mu*std::sqrt(mu));
-  if (p <= 0.0) 
+  if (p <= 0.0)
     R = a*(b*R + 3.0*(Rcx-Rf(x,y,z)));
   return R;
 }
@@ -266,6 +266,5 @@ double Ellip::Rc(const double x_, const double y_)
 
   return w*(1.0+s*s*(C[0]+s*(C[1]+s*(C[2]+s*C[3]))))/std::sqrt(mu);
 }
-
 
 #endif /* end of include guard: ELLIPTIC_H */

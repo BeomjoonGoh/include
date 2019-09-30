@@ -16,7 +16,6 @@ class Legendre
     static double P(const int l, const double x);
     static double P(const int l, const int m, const double x);
     static double p(const int l, const int m, const double x);
-  private:
 };
 
 inline double Legendre::P(const int l, const double x)
@@ -30,9 +29,8 @@ inline double Legendre::P(const int l, const int m, const double x)
   // Note: Will overflow for m ~ 80, or sooner if l >> m
   assert(0 <= m && m <= l && Maths::abs(x) <= 1.0, "m,l,x="<<m<<","<<l<<","<<x);
   double prod = 1.0;
-  for (int j = l-m+1; j <= l+m; j++) {
+  for (int j = l-m+1; j <= l+m; j++)
     prod *= j;
-  }
   return std::sqrt(4.0*Maths::pi*prod/(2*l+1))*p(l,m,x);
 }
 

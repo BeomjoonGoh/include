@@ -78,7 +78,7 @@ class Bessel : public BesselN
     }
 
   private:
-    double Jo, Yo, Jpo, Ypo; 
+    double Jo, Yo, Jpo, Ypo;
     double Io, Ko, Ipo, Kpo;
     double Aio,Bio,Aipo,Bipo;
     double jo, yo, jpo, ypo;
@@ -126,7 +126,7 @@ double BesselN::Y0(const double x)
     double J0x = J0(x);
     rational(x, Y0r, Y0s, 8);
     return nump/denp+twoopi*J0x*std::log(x);
-  } else { 
+  } else {
     ax = x;
     asymptot(Y0pn, Y0pd, Y0qn, Y0qd, 1.);
     return std::sqrt(twoopi/x)*(std::sin(xx)*nump/denp+z*std::cos(xx)*numq/denq);
@@ -258,7 +258,7 @@ double BesselN::I0(const double x)
 }
 
 double BesselN::I1(const double x)
-{ 
+{
   ax = Maths::abs(x);
   if (ax < 15.0) {
     y = x*x;
@@ -289,7 +289,7 @@ double BesselN::K1(const double x)
     double term = polynomial(K1pi, 4, z)*std::log(x)/polynomial(K1qi, 2, 1.-z);
     return x*(polynomial(K1p, 4, z)/polynomial(K1q, 2, 1.-z)+term)+1./x;
   } else {
-    z = 1.0/x; 
+    z = 1.0/x;
     return std::exp(-x)*polynomial(K1pp, 7, z)/(polynomial(K1qq, 7, z)*std::sqrt(x));
   }
 }
@@ -319,7 +319,7 @@ double BesselN::In(const int n, const double x)
 
   double bi, bim, bip;
   double ans;
-  if (x*x <= 8.0*Maths::doubleMin) { 
+  if (x*x <= 8.0*Maths::doubleMin) {
     return 0.0;
   } else {
     double tox = 2.0/Maths::abs(x);
@@ -331,11 +331,11 @@ double BesselN::In(const int n, const double x)
       bim = bip+j*tox*bi;
       bip = bi;
       bi = bim;
-      frexp(bi, &k);
+      std::frexp(bi, &k);
       if (k > IEXP) { // Renormalize to prevent overflows.
-        ans = ldexp(ans, -IEXP);
-        bi = ldexp(bi, -IEXP);
-        bip = ldexp(bip, -IEXP);
+        ans = std::ldexp(ans, -IEXP);
+        bi  = std::ldexp(bi, -IEXP);
+        bip = std::ldexp(bip, -IEXP);
       }
       if (j == n) ans = bip;
     }
@@ -428,13 +428,13 @@ double Bessel::Inu(const double nu, const double x)
 }
 
 double Bessel::Knu(const double nu, const double x)
-{ 
+{
   if (nu != nuIK || x != xIK) besselIK(nu, x);
   return Ko;
 }
 
 double Bessel::Ai(const double x)
-{ 
+{
   if (x != xAB) airy(x);
   return Aio;
 }
@@ -458,7 +458,7 @@ double Bessel::yn(const int n, const double x)
 }
 
 void Bessel::besselJY(const double nu, const double x)
-{ // Sets Jo, Yo, Jpo, and Ypo respectively to the Bessel functions Jnu(x), Ynu(x) and their derivatives Jnu'(x), 
+{ // Sets Jo, Yo, Jpo, and Ypo respectively to the Bessel functions Jnu(x), Ynu(x) and their derivatives Jnu'(x),
   // Ynu'(x), for positive x and for xnu = \nu >= 0. The relative accuracy is within one or two significant digits of
   // Maths::absEpsilon, except near a zero of one of the functions, where Maths::absEpsilon controls its absolute accuracy. Fmin is a number close
   // to the machine's smallest floating-point number.
@@ -604,7 +604,7 @@ void Bessel::besselJY(const double nu, const double x)
 }
 
 void Bessel::besselIK(const double nu, const double x)
-{ // Sets Io, Ko, Ipo, and Kpo respectively to the Bessel functions Inu(x), Knu(x) and their derivatives Inu'(x), 
+{ // Sets Io, Ko, Ipo, and Kpo respectively to the Bessel functions Inu(x), Knu(x) and their derivatives Inu'(x),
   // Knu'(x), for positive x and for xnu = \nu >= 0. The relative accuracy is within one or two significant digits of
   // Maths::absEpsilon. Fmin is a number close to the machine's smallest floating-point number.
   double rk1, rkmu, rkmup;

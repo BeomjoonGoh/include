@@ -10,7 +10,7 @@ class Spherical
 { // Spherical harmonics Y_{lm}(\theta, \phi), -l <= m <= l.
   // they are related to the renormalized associated Legendre polynomials for m >= 0:
   //    Y_{lm}(\theta,\phi) = p^{m}_{l}(cos\theta) e^{im\phi}
-  // and 
+  // and
   //    Y_{l-m}(\theta,\phi) = (-1)^m [Y_{lm}(\theta,\phi)]^{*}
   // so for m < 0 as well.
   public:
@@ -27,6 +27,5 @@ class Spherical
       return compdb{plMx*std::cos(mphi), plMx*std::sin(mphi)};
     }
 };
-
 
 #endif /* end of include guard: SPHERICAL_H */
