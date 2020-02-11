@@ -137,10 +137,10 @@ bool ParamSet::Read(const std::string &inputf, char delim)
 template <typename T>
 std::ostream& operator<< (std::ostream &os, const std::vector<T> &v)
 {
-  os << "( ";
+  os << "[ ";
   for (auto &i : v)
-    os << i << " ";
-  os << ")";
+    os << i << ", ";
+  os << "]";
   return os;
 }
 
@@ -157,22 +157,23 @@ std::ostream& operator<< (std::ostream &os, const std::map<T,U> &m)
 template <typename T>
 std::istream& operator>> (std::istream &is, std::vector<T> &v)
 {
-  char paren;
+  char paren, comma;
   is >> std::ws >> paren;
   T val;
   v.resize(0);
-  while ((is>>std::ws).peek() != ')') {
+  while ((is>>std::ws).peek() != ')' && is.peek() != ']') {
     is >> val;
+    if ((is>>std::ws).peek() == ',') is >> comma;
     v.push_back(val);
   }
-  is >>std::ws>> paren;
+  is >> std::ws >> paren;
   return is;
 }
 
 template <typename T, typename U>
 std::istream& operator>> (std::istream &is, std::map<T,U> &m)
 {
-  char paren, colon;
+  char paren, colon, comma;
   is >> std::ws >> paren;
   T key;
   U val;
@@ -181,6 +182,7 @@ std::istream& operator>> (std::istream &is, std::map<T,U> &m)
     is >> key;
     is >> std::ws >> colon >> std::ws;
     is >> val;
+    if ((is>>std::ws).peek() == ',') is >> comma;
     m[key] = val;
   }
   is >> std::ws >> paren;
