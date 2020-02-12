@@ -429,7 +429,7 @@ double normalizedDiff(const F1d<T> &f1, const F1d<T> &f2)
     dif += Maths::abs(f1[i]-f2[i]);
     nor += Maths::abs(f2[i]);
   }
-  double ndif = dif/nor;
+  double ndif = (nor!=0.0) ? dif/nor : 0.0;
   return ndif;
 }
 template <>
@@ -442,7 +442,7 @@ double normalizedDiff(const F1d<compdb> &f1, const F1d<compdb> &f2)
     dif += abs(f1[i]-f2[i]);
     nor += abs(f2[i]);
   }
-  double ndif = dif/nor;
+  double ndif = (nor!=0.0) ? dif/nor : 0.0;
   return ndif;
 }
 template <typename T>
