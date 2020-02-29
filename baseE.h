@@ -112,6 +112,7 @@ inline bool operator> (const baseE& x, const baseE& y)
 {
   return (x.t > y.t) ? (x.r > y.r * exp(y.t-x.t)) : (x.r * exp(x.t-y.t) > y.r);
 }
+
 inline bool operator< (const baseE& x, const baseE& y)
 {
   return (x.t > y.t) ? (x.r < y.r * exp(y.t-x.t)) : (x.r * exp(x.t-y.t) < y.r);

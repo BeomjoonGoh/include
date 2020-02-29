@@ -113,6 +113,7 @@ inline M1d::M1d(int N_)
   Dx = new double[N];
   D1x = new double[N];
 }
+
 inline M1d::M1d(const M1d &m)
 {
   N = m.N;
@@ -124,6 +125,7 @@ inline M1d::M1d(const M1d &m)
   std::copy(m.Dx, m.Dx+m.N, Dx);
   std::copy(m.D1x, m.D1x+m.N, D1x);
 }
+
 inline M1d::~M1d()
 {
   delete[] x;
@@ -133,6 +135,7 @@ inline M1d::~M1d()
   Dx = nullptr;
   D1x = nullptr;
 }
+
 inline M1d& M1d::operator= (const M1d &m)
 {
   if (this == &m)
@@ -150,6 +153,7 @@ inline M1d& M1d::operator= (const M1d &m)
   std::copy(m.D1x, m.D1x+m.N, this->D1x);
   return *this;
 }
+
 inline void M1d::resize(int N_)
 {
   assert0(N_ >= 0);
@@ -164,6 +168,7 @@ inline void M1d::resize(int N_)
   N = N_;
   dN = Maths::max(10,static_cast<int>(std::pow(N,0.25)));
 }
+
 inline void M1d::Set()
 {
   Dx[0] = 0.5*(x[1]-x[0]);
@@ -175,6 +180,7 @@ inline void M1d::Set()
   Dx[N-1] = 0.5*(x[N-1]-x[N-2]);
   D1x[N-1] = 0.0;
 }
+
 inline void M1d::makeEqDist(int N_, double a, double b)
 {
   resize(N_);
@@ -183,6 +189,7 @@ inline void M1d::makeEqDist(int N_, double a, double b)
   }
   Set();
 }
+
 inline void M1d::makeTan(int N_, double dx, double x1)
 { // x \in [-x1, x1]
   // Note: 0.0 is (not) included if N is (even) odd
@@ -233,6 +240,7 @@ inline void M1d::makeLogTan(int N_, double x0, double x1, double x2, double alph
     x[N1 + i] = w*std::tan(a+(i+1)*b/N2);
   Set();
 }
+
 inline void M1d::makePosEqLogTan0(int N_, double x0, double x1, double x2, double alpha)
 { // x \in [0, x2)
   //  1) 0. ~ x0 : equi-distance mesh,
@@ -272,6 +280,7 @@ inline void M1d::makePosEqLogTan0(int N_, double x0, double x1, double x2, doubl
     x[N0+N1+i] = w*std::tan(a+(i+1)*b/N2);
   Set();
 }
+
 inline void M1d::makePosEqLogTan(int N_, double x0, double x1, double x2, double alpha)
 { // x \in (0, x2)
   //  1) 0. ~ x0 : equi-distance mesh,
@@ -311,6 +320,7 @@ inline void M1d::makePosEqLogTan(int N_, double x0, double x1, double x2, double
     x[N0+N1+i] = w*std::tan(a+(i+1)*b/N2);
   Set();
 }
+
 inline void M1d::makeEqLogTan0(int N_, double x0, double x1, double x2, double alpha)
 { // x \in (-x2, x2)
   //  1) -x0 ~  x0 : equi-distance mesh,
@@ -331,6 +341,7 @@ inline void M1d::makeEqLogTan0(int N_, double x0, double x1, double x2, double a
   delete[] tmp;
   Set();
 }
+
 inline void M1d::makeEqLogTan(int N_, double x0, double x1, double x2, double alpha)
 { // x \in [-x2, x2]
   //  1) -x0 ~  x0 : equi-distance mesh,
@@ -352,6 +363,7 @@ inline void M1d::makeEqLogTan(int N_, double x0, double x1, double x2, double al
   delete[] tmp;
   Set();
 }
+
 inline int M1d::whereIs(double a, int &i) const
 { // returns i where, x[i] <= a < x[i+1], i = [0,N-1). i is found by increasing it
   if (a < x[i+1]) return i;
@@ -359,11 +371,13 @@ inline int M1d::whereIs(double a, int &i) const
     i++;
   return i;
 }
+
 inline int M1d::whereIs(double a) const
 {
   int i = 0;
   return whereIs(a, i);
 }
+
 inline int M1d::whereIsD(double a, int &i) const
 { // returns i where, x[i] <= a < x[i+1], i = [0,N-1). i is found by decreasing it
   if (a > x[i]) return i;
@@ -371,11 +385,13 @@ inline int M1d::whereIsD(double a, int &i) const
     i--;
   return i;
 }
+
 inline int M1d::whereIsD(double a) const
 {
   int i = N-1;
   return whereIsD(a, i);
 }
+
 inline int M1d::bisection(double a, int &jl, int &ju) const
 {
   int j = 0;
@@ -388,6 +404,7 @@ inline int M1d::bisection(double a, int &jl, int &ju) const
   }
   return jl;
 }
+
 inline int M1d::fInd(double a, int& i) const
 {
   if (a < x[i+1])
@@ -418,11 +435,13 @@ inline int M1d::fInd(double a, int& i) const
   i++;
   return bisection(a, i, iu);
 }
+
 inline int M1d::fInd(double a) const
 {
   int i = 0;
   return fInd(a,i);
 }
+
 inline int M1d::finD(double a, int& i) const
 {
   if (a >= x[i])
@@ -449,17 +468,20 @@ inline int M1d::finD(double a, int& i) const
   i -= dN-2;
   return i = bisection(a, il, i);
 }
+
 inline int M1d::finD(double a) const
 {
   int i = N-2;
   return finD(a,i);
 }
+
 inline Interp M1d::getInterp(const double a, int &i, locateFcn locate) const
 {
   int j = (this->*locate)(a, i);
   double d = (a-x[j])*D1x[j];
   return Interp{j,d};
 }
+
 bool M1d::Read(const std::string &inputf)
 {
   std::ifstream inf{inputf};
@@ -493,6 +515,7 @@ bool M1d::Read(const std::string &inputf)
 
   return true;
 }
+
 void M1d::Print(const std::string &outputf, const std::string &comment)
 {
   std::ofstream outf{outputf};

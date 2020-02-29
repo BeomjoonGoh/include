@@ -88,7 +88,6 @@ int Maths::binomial(int n, int m)
 }
 
 
-
 class Maths::QuadEq
 { // Quadratic equation : Q(x) = C_0 (x-x0)^2 + 2 C_1 (x-x0) + C_2
   private:

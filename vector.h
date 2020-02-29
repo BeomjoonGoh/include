@@ -24,6 +24,7 @@ template <typename T> std::vector<T> operator+(const std::vector<T> &v, const st
     vec[i] += w[i];
   return vec;
 }
+
 template <typename T> std::vector<T> operator+(const std::vector<T> &v, T a)
 {
   std::vector<T> vec {v};
@@ -31,6 +32,7 @@ template <typename T> std::vector<T> operator+(const std::vector<T> &v, T a)
     i += a;
   return vec;
 }
+
 template <typename T> std::vector<T> operator+(T a, const std::vector<T> &v) { v + a; }
 
 template <typename T> std::vector<T> operator*(const std::vector<T> &v, const std::vector<T> &w)
@@ -48,6 +50,7 @@ template <typename T> std::vector<T> operator*(const std::vector<T> &v, T a)
   for (auto &i : vec) i *= a;
   return vec;
 }
+
 template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v) { v * a; }
 
 template <typename T> T sum(const std::vector<T> &v)
@@ -66,6 +69,7 @@ template <typename T> T dot(const std::vector<T> &v, const std::vector<T> &w)
     sum += v[i]*w[i];
   return sum;
 }
+
 //template <typename T> double dot(const std::vector<T> &v, const std::vector<T> &w)
 //{
 //  assert0(v.size() == w.size());

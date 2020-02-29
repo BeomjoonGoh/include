@@ -155,7 +155,7 @@ class F2d
 
     int size() const { return N; }
     int sizeD() const { return Nd; }
-    void resize(int Nd_ = 0, int N_ = 0); 
+    void resize(int Nd_ = 0, int N_ = 0);
     void Set(int Nd_, int N_, T vi);
     double Rms();
     template <typename U> friend double normalizedDiff(const F2d<U> &F1, const F2d<U> &F2);
@@ -178,6 +178,7 @@ inline F1d<T>::F1d(int N_)
   N = N_;
   v = new T[N];
 }
+
 template <typename T>
 inline F1d<T>::F1d(int N_, T vi)
 {
@@ -187,6 +188,7 @@ inline F1d<T>::F1d(int N_, T vi)
   for (int i = 0; i < N; i++)
     v[i] = vi;
 }
+
 template <typename T>
 inline F1d<T>::F1d(const F1d<T> &f)
 {
@@ -204,6 +206,7 @@ inline F1d<T> F1d<T>::operator- () const
     f.v[i] = -static_cast<T>(1)*this->v[i];
   return f;
 }
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator= (const F1d<T> &f)
 {
@@ -213,6 +216,7 @@ inline F1d<T>& F1d<T>::operator= (const F1d<T> &f)
   std::copy(f.v, f.v+f.N, this->v);
   return *this;
 }
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator+= (const F1d<T> &f)
 {
@@ -220,14 +224,16 @@ inline F1d<T>& F1d<T>::operator+= (const F1d<T> &f)
   for (int i = 0; i < this->N; i++)
     this->v[i] += f.v[i];
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator+= (const T &a)
 {
   for (int i = 0; i < this->N; i++)
     this->v[i] += a;
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator-= (const F1d<T> &f)
 {
@@ -235,14 +241,16 @@ inline F1d<T>& F1d<T>::operator-= (const F1d<T> &f)
   for (int i = 0; i < this->N; i++)
     this->v[i] -= f.v[i];
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator-= (const T &a)
 {
   for (int i = 0; i < this->N; i++)
     this->v[i] -= a;
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator*= (const F1d<T> &f)
 {
@@ -250,14 +258,16 @@ inline F1d<T>& F1d<T>::operator*= (const F1d<T> &f)
   for (int i = 0; i < this->N; i++)
     this->v[i] *= f.v[i];
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator*= (const T &a)
 {
   for (int i = 0; i < this->N; i++)
     this->v[i] *= a;
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator/= (const F1d<T> &f)
 {
@@ -267,7 +277,8 @@ inline F1d<T>& F1d<T>::operator/= (const F1d<T> &f)
     this->v[i] /= f.v[i];
   }
   return *this;
-} 
+}
+
 template <typename T>
 inline F1d<T>& F1d<T>::operator/= (const T &a)
 {
@@ -275,7 +286,7 @@ inline F1d<T>& F1d<T>::operator/= (const T &a)
   for (int i = 0; i < this->N; i++)
     this->v[i] /= a;
   return *this;
-} 
+}
 
 template <typename T>
 inline F1d<T> operator+ (const F1d<T> &f1, const F1d<T> &f2)
@@ -285,7 +296,8 @@ inline F1d<T> operator+ (const F1d<T> &f1, const F1d<T> &f2)
   for (int i = 0; i < f1.N; i++)
     g[i] = f1[i] + f2[i];
   return g;
-} 
+}
+
 template <typename T>
 inline F1d<T> operator+ (const F1d<T> &f, const T &a)
 {
@@ -293,12 +305,13 @@ inline F1d<T> operator+ (const F1d<T> &f, const T &a)
   for (int i = 0; i < f.N; i++)
     g[i] = f[i] + a;
   return g;
-} 
+}
+
 template <typename T>
 inline F1d<T> operator+ (const T &a, const F1d<T> &f)
 {
   return f + a;
-} 
+}
 
 template <typename T>
 inline F1d<T> operator- (const F1d<T> &f1, const F1d<T> &f2)
@@ -308,19 +321,21 @@ inline F1d<T> operator- (const F1d<T> &f1, const F1d<T> &f2)
   for (int i = 0; i < f1.N; i++)
     g[i] = f1[i] - f2[i];
   return g;
-} 
+}
+
 template <typename T>
 inline F1d<T> operator- (const F1d<T> &f, const T &a)
 {
   return f + (-a);
 }
+
 template <typename T>
 inline F1d<T> operator- (const T &a, const F1d<T> &f) {
   F1d<T> g{f.N};
   for (int i = 0; i < f.N; i++)
     g[i] = a - f[i];
   return g;
-} 
+}
 
 template <typename T>
 inline F1d<T> operator* (const F1d<T> &f1, const F1d<T> &f2)
@@ -330,7 +345,8 @@ inline F1d<T> operator* (const F1d<T> &f1, const F1d<T> &f2)
   for (int i = 0; i < f1.N; i++)
     g[i] = f1[i] * f2[i];
   return g;
-} 
+}
+
 template <typename T>
 inline F1d<T> operator* (const F1d<T> &f, const T &a)
 {
@@ -338,12 +354,13 @@ inline F1d<T> operator* (const F1d<T> &f, const T &a)
   for (int i = 0; i < f.N; i++)
     g[i] = f[i] * a;
   return g;
-} 
+}
+
 template <typename T>
 inline F1d<T> operator* (const T &a, const F1d<T> &f)
 {
   return f * a;
-} 
+}
 
 template <typename T>
 inline F1d<T> operator/ (const F1d<T> &f1, const F1d<T> &f2)
@@ -361,7 +378,8 @@ inline F1d<T> operator/ (const F1d<T> &f, const T &a)
 {
   assert(a != 0., "Divide by zero");
   return f * (1./a);
-} 
+}
+
 template <typename T>
 inline F1d<T> operator/ (const T &a, const F1d<T> &f)
 {
@@ -383,6 +401,7 @@ inline void F1d<T>::resize(int N_)
   }
   N = N_;
 }
+
 template <typename T>
 inline void F1d<T>::Set(int N_, T vi)
 {
@@ -390,6 +409,7 @@ inline void F1d<T>::Set(int N_, T vi)
   for (int i = 0; i < N; i++)
     v[i] = vi;
 }
+
 template <typename T>
 inline void F1d<T>::push_back(const T &last)
 {
@@ -403,6 +423,7 @@ inline void F1d<T>::push_back(const T &last)
   std::copy(vtmp,vtmp+N,v);
   delete[] vtmp;
 }
+
 template <typename T>
 inline T F1d<T>::Sum()
 {
@@ -411,6 +432,7 @@ inline T F1d<T>::Sum()
     sum += v[i];
   return sum;
 }
+
 template <typename T>
 inline double F1d<T>::Rms()
 {
@@ -419,6 +441,7 @@ inline double F1d<T>::Rms()
     sum += (conj(v[i])*v[i]).real();
   return abs(sqrt(sum))/N;
 }
+
 template <typename T>
 double normalizedDiff(const F1d<T> &f1, const F1d<T> &f2)
 {
@@ -432,6 +455,7 @@ double normalizedDiff(const F1d<T> &f1, const F1d<T> &f2)
   double ndif = (nor!=0.0) ? dif/nor : 0.0;
   return ndif;
 }
+
 template <>
 double normalizedDiff(const F1d<compdb> &f1, const F1d<compdb> &f2)
 {
@@ -445,6 +469,7 @@ double normalizedDiff(const F1d<compdb> &f1, const F1d<compdb> &f2)
   double ndif = (nor!=0.0) ? dif/nor : 0.0;
   return ndif;
 }
+
 template <typename T>
 template <typename M1d>
 void F1d<T>::Print(const M1d &x, const std::string &outputf, const std::string &comment) {
@@ -458,6 +483,7 @@ void F1d<T>::Print(const M1d &x, const std::string &outputf, const std::string &
   for (int i = 0; i < N; i++)
     outf << x[i] << '\t' << v[i] << '\n';
 }
+
 template <typename T>
 void F1d<T>::Print(const std::string &outputf, const std::string &comment)
 {
@@ -468,6 +494,7 @@ void F1d<T>::Print(const std::string &outputf, const std::string &comment)
   for (int i = 0; i < N; i++)
     outf << v[i] << '\n';
 }
+
 template <typename T>
 bool F1d<T>::Read(const std::string &inputf, const std::string &descrip)
 {
@@ -494,8 +521,9 @@ bool F1d<T>::Read(const std::string &inputf, const std::string &descrip)
 
   return true;
 }
+
 template <typename T>
-template <typename M1d> 
+template <typename M1d>
 bool F1d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << "with mesh from " << inputf << "\n";
@@ -532,6 +560,7 @@ bool F1d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip
 
   return true;
 }
+
 template <typename T, typename M1d>
 F1d<T> kramerskronig(const M1d &x, const F1d<T> &f)
 {
@@ -554,6 +583,7 @@ F1d<T> kramerskronig(const M1d &x, const F1d<T> &f)
   }
   return g;
 }
+
 template <typename T>
 inline T integralTZ(F1d<T> &f, double dx, int i, int j)
 { // \sum_{k=i}^{j} w_{k}*f_{k}*dx  where  w_{k} (k==i,j)? 1/2 : 1
@@ -566,6 +596,7 @@ inline T integralTZ(F1d<T> &f, double dx, int i, int j)
   sum += 0.5*f[j];
   return sum*static_cast<T>(dx);
 }
+
 template <typename T>
 inline T integralTZ2(F1d<T> &f, double dx, int i, int j)
 { // \sum_{k=i}^{j} w_{k}*f_{k}*dx  where  w_{k} (k==i)? 1/2 : 1
@@ -577,8 +608,9 @@ inline T integralTZ2(F1d<T> &f, double dx, int i, int j)
     sum += f[k];
   return sum*static_cast<T>(dx);
 }
+
 template <typename T>
-template <typename M1d> 
+template <typename M1d>
 void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
 { // Interpolating cubic spline function for irregularly-spaced points. Assumes that X1,X2 entries are monotonically
   // increasing.
@@ -619,7 +651,7 @@ void F1d<T>::cspline(const M1d &X1, const F1d<T> &Y1, const M1d &X2)
 }
 
 template <typename T>
-template <typename M1d> 
+template <typename M1d>
 void F1d<T>::getYD_gen(const M1d &X, const F1d<T> &Y, F1d<T> &YD)
 { // YD <- Computed 1st derivative of data in X,Y (X.size() entries). The not-a-knot boundary condition is used.
   F1d<T> A{X.size()}, B{X.size()}, C{X.size()};
@@ -651,6 +683,7 @@ void F1d<T>::getYD_gen(const M1d &X, const F1d<T> &Y, F1d<T> &YD)
   // solve for the tridiagonal matrix: YD=YD*inv(tridiag matrix)
   tridiag_gen(A,B,C,YD);
 }
+
 template <typename T>
 void F1d<T>::tridiag_gen(const F1d<T> &A, const F1d<T> &B, const F1d<T> &C, F1d<T> &D)
 { // Gauss Elimination with backsubstitution for general tridiagonal matrix with bands A,B,C and column D.
@@ -669,7 +702,7 @@ void F1d<T>::tridiag_gen(const F1d<T> &A, const F1d<T> &B, const F1d<T> &C, F1d<
 }
 
 template <typename T>
-template <typename Interp> 
+template <typename Interp>
 inline T F1d<T>::line(const Interp &jd) const
 {
   return v[jd.j]+jd.d*(v[jd.j+1]-v[jd.j]);
@@ -693,6 +726,7 @@ inline F2d<T>::F2d(int Nd_, int N_)
   for (int i = 0; i < Nd; i++)
     v[i].init(N,begins+i*N);
 }
+
 template <typename T>
 inline F2d<T>::F2d(int Nd_, int N_, T vi)
 {
@@ -712,6 +746,7 @@ inline F2d<T>::F2d(int Nd_, int N_, T vi)
     }
   }
 }
+
 template <typename T>
 inline F2d<T>::F2d(int Nd_, const F1d<T> &f)
 {
@@ -731,6 +766,7 @@ inline F2d<T>::F2d(int Nd_, const F1d<T> &f)
     }
   }
 }
+
 template <typename T>
 inline F2d<T>::F2d(const F2d<T> &F)
 {
@@ -757,6 +793,7 @@ inline F2d<T> F2d<T>::operator- () const
       F(i,j) *= static_cast<T>(-1);
   return F;
 }
+
 template <typename T>
 inline F2d<T>& F2d<T>::operator= (const F2d<T> &F)
 {
@@ -784,111 +821,123 @@ inline F2d<T>& F2d<T>::operator= (const F2d<T> &F)
 
   return *this;
 }
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator+= (const F2d<T> &F) 
-{ 
+inline F2d<T>& F2d<T>::operator+= (const F2d<T> &F)
+{
   assert0((this->Nd == F.Nd) && (this->N == F.N));
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] += F(i,j); 
-  return *this; 
-} 
+      (this->v)[i][j] += F(i,j);
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator+= (const F1d<T> &f) 
-{ 
+inline F2d<T>& F2d<T>::operator+= (const F1d<T> &f)
+{
   assert0(this->N == f.size());
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] += f[j]; 
-  return *this; 
-} 
+      (this->v)[i][j] += f[j];
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator+= (const T &a) 
-{ 
+inline F2d<T>& F2d<T>::operator+= (const T &a)
+{
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
       (this->v)[i][j] += a;
-  return *this; 
-} 
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator-= (const F2d<T> &F) 
-{ 
+inline F2d<T>& F2d<T>::operator-= (const F2d<T> &F)
+{
   assert0((this->Nd == F.Nd) && (this->N == F.N));
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] -= F(i,j); 
-  return *this; 
-} 
+      (this->v)[i][j] -= F(i,j);
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator-= (const F1d<T> &f) 
-{ 
+inline F2d<T>& F2d<T>::operator-= (const F1d<T> &f)
+{
   assert0(this->N == f.size());
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] -= f[j]; 
-  return *this; 
-} 
+      (this->v)[i][j] -= f[j];
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator-= (const T &a) 
-{ 
+inline F2d<T>& F2d<T>::operator-= (const T &a)
+{
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
       (this->v)[i][j] -= a;
-  return *this; 
-} 
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator*= (const F2d<T> &F) 
-{ 
+inline F2d<T>& F2d<T>::operator*= (const F2d<T> &F)
+{
   assert0((this->Nd == F.Nd) && (this->N == F.N));
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] *= F(i,j); 
-  return *this; 
-} 
+      (this->v)[i][j] *= F(i,j);
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator*= (const F1d<T> &f) 
-{ 
+inline F2d<T>& F2d<T>::operator*= (const F1d<T> &f)
+{
   assert0(this->N == f.size());
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] *= f[j]; 
-  return *this; 
-} 
+      (this->v)[i][j] *= f[j];
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator*= (const T &a) 
-{ 
+inline F2d<T>& F2d<T>::operator*= (const T &a)
+{
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
       (this->v)[i][j] *= a;
-  return *this; 
-} 
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator/= (const F2d<T> &F) 
-{ 
+inline F2d<T>& F2d<T>::operator/= (const F2d<T> &F)
+{
   assert0((this->Nd == F.Nd) && (this->N == F.N));
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] /= F(i,j); 
-  return *this; 
-} 
+      (this->v)[i][j] /= F(i,j);
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator/= (const F1d<T> &f) 
-{ 
+inline F2d<T>& F2d<T>::operator/= (const F1d<T> &f)
+{
   assert0(this->N == f.size());
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
-      (this->v)[i][j] /= f[j]; 
-  return *this; 
-} 
+      (this->v)[i][j] /= f[j];
+  return *this;
+}
+
 template <typename T>
-inline F2d<T>& F2d<T>::operator/= (const T &a) 
-{ 
+inline F2d<T>& F2d<T>::operator/= (const T &a)
+{
   assert(a != 0., "Divide by zero(F2d/=a)");
   for (int i = 0; i < Nd; i++)
     for (int j = 0; j < N; j++)
       (this->v)[i][j] /= a;
-  return *this; 
-} 
+  return *this;
+}
 
 template <typename T>
 inline F2d<T> operator+ (const F2d<T> &F1, const F2d<T> &F2)
@@ -899,7 +948,8 @@ inline F2d<T> operator+ (const F2d<T> &F1, const F2d<T> &F2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) + F2(i,j);
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator+ (const F2d<T> &F1, const F1d<T> &f2)
 {
@@ -909,12 +959,14 @@ inline F2d<T> operator+ (const F2d<T> &F1, const F1d<T> &f2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) + f2[j];
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator+ (const F1d<T> &f1, const F2d<T> &F2)
 {
   return F2 + f1;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator+ (const F2d<T> &F, const T &a)
 {
@@ -923,12 +975,13 @@ inline F2d<T> operator+ (const F2d<T> &F, const T &a)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F(i,j) + a;
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator+ (const T &a, const F2d<T> &F)
 {
   return F + a;
-} 
+}
 
 template <typename T>
 inline F2d<T> operator- (const F2d<T> &F1, const F2d<T> &F2)
@@ -939,7 +992,8 @@ inline F2d<T> operator- (const F2d<T> &F1, const F2d<T> &F2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) - F2(i,j);
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator- (const F2d<T> &F1, const F1d<T> &f2)
 {
@@ -949,7 +1003,8 @@ inline F2d<T> operator- (const F2d<T> &F1, const F1d<T> &f2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) - f2[j];
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator- (const F1d<T> &f1, const F2d<T> &F2)
 {
@@ -959,12 +1014,14 @@ inline F2d<T> operator- (const F1d<T> &f1, const F2d<T> &F2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = f1[j] - F2(i,j);
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator- (const F2d<T> &F, const T &a)
 {
   return F + (-a);
 }
+
 template <typename T>
 inline F2d<T> operator- (const T &a, const F2d<T> &F)
 {
@@ -973,7 +1030,7 @@ inline F2d<T> operator- (const T &a, const F2d<T> &F)
     for (int j = 0; j < G.N; j++)
       G(i,j) = a - F(i,j);
   return G;
-} 
+}
 
 template <typename T>
 inline F2d<T> operator* (const F2d<T> &F1, const F2d<T> &F2)
@@ -984,7 +1041,8 @@ inline F2d<T> operator* (const F2d<T> &F1, const F2d<T> &F2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) * F2(i,j);
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator* (const F2d<T> &F1, const F1d<T> &f2)
 {
@@ -994,30 +1052,33 @@ inline F2d<T> operator* (const F2d<T> &F1, const F1d<T> &f2)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F1(i,j) * f2[j];
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator* (const F1d<T> &f1, const F2d<T> &F2)
 {
   return F2 * f1;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator* (const F2d<T> &F, const T &a)
-{ 
+{
   F2d<T> G{F.Nd, F.N};
   for (int i = 0; i < G.Nd; i++)
     for (int j = 0; j < G.N; j++)
       G(i,j) = F(i,j) * a;
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator* (const T &a, const F2d<T> &F)
 {
   return F * a;
-} 
+}
 
 template <typename T>
 inline F2d<T> operator/ (const F2d<T> &F1, const F2d<T> &F2)
-{ 
+{
   assert0((F1.Nd == F2.Nd) && (F1.N == F2.N));
   F2d<T> G{F1.Nd, F1.N};
   for (int i = 0; i < G.Nd; i++) {
@@ -1027,10 +1088,11 @@ inline F2d<T> operator/ (const F2d<T> &F1, const F2d<T> &F2)
     }
   }
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator/ (const F2d<T> &F1, const F1d<T> &f2)
-{ 
+{
   assert0(F1.N == f2.size());
   F2d<T> G{F1.Nd, F1.N};
   for (int i = 0; i < G.Nd; i++) {
@@ -1040,10 +1102,11 @@ inline F2d<T> operator/ (const F2d<T> &F1, const F1d<T> &f2)
     }
   }
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator/ (const F1d<T> &f1, const F2d<T> &F2)
-{ 
+{
   assert0(f1.size() == F2.N);
   F2d<T> G{F2.Nd, F2.N};
   for (int i = 0; i < G.Nd; i++) {
@@ -1053,13 +1116,15 @@ inline F2d<T> operator/ (const F1d<T> &f1, const F2d<T> &F2)
     }
   }
   return G;
-} 
+}
+
 template <typename T>
 inline F2d<T> operator/ (const F2d<T> &F, const T &a)
 {
   assert(a != 0., "Divide by zero");
   return F * (1./a);
-} 
+}
+
 template <typename T>
 inline F2d<T> operator/ (const T &a, const F2d<T> &F)
 {
@@ -1096,6 +1161,7 @@ inline void F2d<T>::resize(int Nd_, int N_)
     N = N_;
   }
 }
+
 template <typename T>
 inline void F2d<T>::Set(int Nd_, int N_, T vi)
 {
@@ -1104,6 +1170,7 @@ inline void F2d<T>::Set(int Nd_, int N_, T vi)
     for (int j = 0; j < N; j++)
       v[i][j] = vi;
 }
+
 template <typename T>
 inline double F2d<T>::Rms()
 {
@@ -1112,6 +1179,7 @@ inline double F2d<T>::Rms()
     sum += v[i].Rms();
   return sum/Nd;
 }
+
 template <typename T>
 double normalizedDiff(const F2d<T> &F1, const F2d<T> &F2)
 {
@@ -1121,8 +1189,9 @@ double normalizedDiff(const F2d<T> &F1, const F2d<T> &F2)
     ndif += normalizedDiff(F1[i],F2[i]);
   return ndif/F1.Nd;
 }
+
 template <typename T>
-template <typename M1d> 
+template <typename M1d>
 void F2d<T>::Print(const M1d &x, const std::string &outputf, const std::string &comment)
 {
   assert0(x.size() == N);
@@ -1140,6 +1209,7 @@ void F2d<T>::Print(const M1d &x, const std::string &outputf, const std::string &
     outf << '\n';
   }
 }
+
 template <typename T>
 bool F2d<T>::Read(const std::string &inputf, const std::string &descrip)
 {
@@ -1168,6 +1238,7 @@ bool F2d<T>::Read(const std::string &inputf, const std::string &descrip)
 
   return true;
 }
+
 template <typename T>
 bool F2d<T>::Readr(const std::string &inputf)
 {
@@ -1194,8 +1265,9 @@ bool F2d<T>::Readr(const std::string &inputf)
 
   return true;
 }
+
 template <typename T>
-template <typename M1d> 
+template <typename M1d>
 bool F2d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << " with mesh from " << inputf << "\n";
@@ -1242,6 +1314,7 @@ bool F2d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip
 
   return true;
 }
+
 template <typename T, typename M1d>
 F2d<T> kramerskronig(const M1d &x, const F2d<T> &F)
 {

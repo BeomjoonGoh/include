@@ -78,6 +78,7 @@ void Param<T>::read(std::istream &is, const std::string &s, char delim)
     else               is.ignore(ssMax,delim) >> value;
   }
 }
+
 template <>
 void Param<bool>::read(std::istream &is, const std::string &s, char delim)
 {

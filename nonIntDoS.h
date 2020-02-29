@@ -49,6 +49,7 @@ class Dos
     void Print(const std::string &outputf, const std::string &comment = "") { D.Print(ep,outputf,comment); } 
 
 };
+
 // {{{
 class Func_Base
 { // Base class for functor classes Func0..3. In all cases, k = \frac{4t}{\e - 2t\cos\phi}, l = 1/k.
@@ -105,6 +106,7 @@ Dos::Dos(const Dos &dos) : d(dos.d), N(dos.N), T(dos.d ? new double[dos.d] : nul
   if (T) 
     std::copy(dos.T, dos.T+dos.d, T);
 }
+
 Dos& Dos::operator= (const Dos &dos)
 {
   if (this == &dos)
@@ -123,6 +125,7 @@ Dos& Dos::operator= (const Dos &dos)
 
   return *this;
 }
+
 void Dos::init(int d_, int N_, double t)
 {
   d = d_;

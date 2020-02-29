@@ -93,7 +93,6 @@ F2d<double> SVD::nullspace(double thresh)
   return N;
 }
 
-
 void SVD::solve(const F1d<double> &b, F1d<double> &x, double thresh)
 { // Solve Ax = b for a vector x using the Moore-Penrose inverse (pseudoinverse) of A as obtained by SVD.
   // If positive, thresh is the threshold value below which singular values are considered as zero.

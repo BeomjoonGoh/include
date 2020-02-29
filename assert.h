@@ -15,6 +15,7 @@
   std::cerr << BLUE("QUIT HERE >")<<__FILE__<<":"<<__LINE__<<" In function '"<<__func__<<"'"<< std::endl;\
   std::exit(1);\
 }
+
 #define quitif(cond, mess) {\
   if ((cond)) { \
     std::cerr << RED("QUIT!") << "since " << "(" #cond ")\n" \
@@ -31,6 +32,7 @@
       std::exit(1);\
     }\
   }
+
   #define assert0(cond) {\
     if (!(cond)) { \
       std::cerr << RED("Assertion!") << "(" #cond ") failed. \n" \
