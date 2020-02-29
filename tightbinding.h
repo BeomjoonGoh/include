@@ -32,7 +32,7 @@ class TightBinding
     TightBinding& operator= (const TightBinding &tb);
     double operator()(const int b, const int c, const int k) { return Hk[b][c][k].real(); }
     const double operator()(const int b, const int c, const int k) const { return Hk[b][c][k].real(); }
-    int size() { return kSize; }
+    int size() const { return kSize; }
     void computeHk(const int Nb, const Map &hopT, const Vec2d &orbitals);
 
   private:
