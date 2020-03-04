@@ -52,7 +52,7 @@ namespace Util {
 
   std::ostream& operator<< (std::ostream &oS, const outV &A);
   void getComment(std::ifstream &inf, const std::string &inputf);
-  void printHelp(const std::string &inputf);
+  std::string unindent(const char *p);
   std::string ordinal(const int i);
   static const char ordinalSuffixes[][3] = {"th", "st", "nd", "rd"};
 
@@ -160,11 +160,21 @@ void Util::getComment(std::ifstream &inf, const std::string &inputf)
   }
 }
 
-void Util::printHelp(const std::string &inputf)
+std::string Util::unindent(const char *p)
 {
-  std::ifstream inf{inputf};
-  if (inf.good()) std::cerr << inf.rdbuf();
-  else            std::cerr << "Cannot find the help document." << std::endl;
+  if (*p == '\n') p++;
+
+  std::string indents;
+  for (; std::isspace(*p) && *p != '\n'; p++)
+    indents += *p;
+
+  std::string result;
+  for (; *p; p++) {
+    result += *p;
+    if (*p == '\n' && std::string(p+1, 0, indents.size()) == indents)
+      p += indents.size();
+  }
+  return result;
 }
 
 std::string Util::ordinal(const int i)
