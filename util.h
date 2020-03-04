@@ -13,11 +13,11 @@ namespace Util {
   class Logging
   { // Redirects clog to "logfileName".
     // Initiated by init() function, closed by, optional, call of terminate() function
-    public: 
+    public:
       static std::ofstream logfileStream;
       static std::streambuf *old_rdbuf;
       static bool is_on;
-    public: 
+    public:
       static void init(std::string logfileName);
       static void terminate();
   };
@@ -51,7 +51,8 @@ namespace Util {
   };
 
   std::ostream& operator<< (std::ostream &oS, const outV &A);
-  void getComment(std::ifstream &inf, const std::string inputf);
+  void getComment(std::ifstream &inf, const std::string &inputf);
+  void printHelp(const std::string &inputf);
   std::string ordinal(const int i);
   static const char ordinalSuffixes[][3] = {"th", "st", "nd", "rd"};
 
@@ -147,7 +148,7 @@ std::string Util::outV::str()
   return oss.str();
 }
 
-void Util::getComment(std::ifstream &inf, const std::string inputf)
+void Util::getComment(std::ifstream &inf, const std::string &inputf)
 {
   inf.clear();                    // forget we hit the end of file
   inf.seekg(0, std::ios::beg);    // move to the start of the file
@@ -158,7 +159,14 @@ void Util::getComment(std::ifstream &inf, const std::string inputf)
     std::clog << "   " << strInput << '\n';
   }
 }
-  
+
+void Util::printHelp(const std::string &inputf)
+{
+  std::ifstream inf{inputf};
+  if (inf.good()) std::cerr << inf.rdbuf();
+  else            std::cerr << "Cannot find the help document." << std::endl;
+}
+
 std::string Util::ordinal(const int i)
 {
   int ord = i % 100;
