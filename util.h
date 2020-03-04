@@ -12,27 +12,18 @@
 namespace Util {
   class Logging
   { // Redirects clog to "logfileName".
-    // Initiated by init() function and wrapped up by terminate() function
-    // Note:
-    //    0) Should not use init() twice before terminate() -- always pair them.
-    //    1) cout will be printed on screen unless redirected (./executable > output.out).
-    //    2) cerr will be printed on screen unless redirected (./executable 2> error.out).
-    //    3) Or one could do both: ./executable > output.out 2> error.out
-    // Recommended usage:
-    //    1) cout to indicate where the program is while running.
-    //    2) cerr when the program needs to terminate immediately. 
-    //    3) clog to record things. 
+    // Initiated by init() function, closed by, optional, call of terminate() function
     public: 
       static std::ofstream logfileStream;
       static std::streambuf *old_rdbuf;
-      static bool dont;
+      static bool is_on;
     public: 
       static void init(std::string logfileName);
       static void terminate();
   };
-  /*extern*/ std::ofstream   Logging::logfileStream;
-  /*extern*/ std::streambuf *Logging::old_rdbuf;
-  /*extern*/ bool       Logging::dont;
+  std::ofstream   Logging::logfileStream;
+  std::streambuf *Logging::old_rdbuf;
+  bool            Logging::is_on = false;
 
   class Timer
   { // Timer class. Instantiate to start the timer and use elapsed() to get elapsed time.
@@ -47,7 +38,7 @@ namespace Util {
   };
 
   class outV
-  { // Functor like class for ostream vector-like object v. Only Instantiation is enough: cout << outV(v);
+  { // Functor like class for ostream vector-like object v. Only instantiation is enough: cout << outV(v);
     private:
       int wid;
       int len;
@@ -68,21 +59,25 @@ namespace Util {
 
 void Util::Logging::init(std::string logfileName)
 {
-  if (logfileName == "NONE") {
-    dont = true;
-    return;
+  if (is_on) {
+    std::cerr << "Util::Logging nested initialization." << std::endl;
+    std::exit(1);
   }
-  dont = false;
+
+  if (logfileName == "STDERR") return;
+  is_on = true;
   logfileStream.open(logfileName);
   old_rdbuf = std::clog.rdbuf();          // Get the rdbuf of clog (We need it to reset the value before exiting).
 
   std::clog.rdbuf(logfileStream.rdbuf()); // Set the rdbuf of clog.
   std::clog << "Logging initiated.\n";
+  std::atexit(Util::Logging::terminate);
 }
 
 void Util::Logging::terminate()
 {
-  if (dont) return;
+  if (!is_on) return;
+  is_on = false;
   std::clog.flush();
   logfileStream.close();
   std::clog.rdbuf(old_rdbuf);             // Reset the rdbuf of clog.
@@ -91,7 +86,6 @@ void Util::Logging::terminate()
 std::string Util::Timer::elapsed()
 {
   std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - m_start;
-  //return std::to_string(elapsed_seconds.count()) + std::string{" sec"};
 
   double i0;
   double d = modf(elapsed_seconds.count(),&i0);
@@ -121,9 +115,9 @@ std::string Util::Timer::currentTD()
   auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
   char buf[100];
-  strftime(buf, sizeof(buf), "%Y-%m-%d %X", localtime(&in_time_t));
-  //stringstream ss;
-  //ss << put_time(localtime(&in_time_t), "%Y-%m-%d %X");
+  std::strftime(buf, sizeof(buf), "%Y-%m-%d %X", std::localtime(&in_time_t));
+  //std::stringstream ss;
+  //ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
   //return ss.str();
   return buf;
 }
