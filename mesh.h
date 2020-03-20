@@ -522,11 +522,11 @@ void M1d::Print(const std::string &outputf, const std::string &comment)
   if (comment != "")
     outf << "# " << comment << '\n';
   
-  outf << "# i\tx[i]\t\t\t Dx[i]\t\t\tD1x[i]\n";
+  outf << "#x[i]\t\t\t Dx[i]\t\t\tD1x[i]\n";
 
   outf << std::fixed << std::setprecision(15);
   for (int i = 0; i < N; i++)
-    outf << i << "\t" << x[i] << std::setw(24) << Dx[i] << std::setw(24) << D1x[i] << '\n';
+    outf << x[i] << std::setw(24) << Dx[i] << std::setw(24) << D1x[i] << '\n';
 }
 
 // ============  AddLogTan  ============
