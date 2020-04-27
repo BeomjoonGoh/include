@@ -18,7 +18,7 @@ namespace Util {
       static std::streambuf *old_rdbuf;
       static bool is_on;
     public:
-      static void init(std::string logfileName);
+      static void init(std::string logfileName, std::ios_base::openmode mode = std::ios_base::out);
       static void terminate();
   };
   std::ofstream   Logging::logfileStream;
@@ -58,7 +58,7 @@ namespace Util {
 
 }
 
-void Util::Logging::init(std::string logfileName)
+void Util::Logging::init(std::string logfileName, std::ios_base::openmode mode)
 {
   if (is_on) {
     std::cerr << "Util::Logging nested initialization." << std::endl;
@@ -67,7 +67,7 @@ void Util::Logging::init(std::string logfileName)
 
   if (logfileName == "STDERR") return;
   is_on = true;
-  logfileStream.open(logfileName);
+  logfileStream.open(logfileName, mode);
   old_rdbuf = std::clog.rdbuf();          // Get the rdbuf of clog (We need it to reset the value before exiting).
 
   std::clog.rdbuf(logfileStream.rdbuf()); // Set the rdbuf of clog.
