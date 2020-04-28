@@ -25,7 +25,7 @@ class TightBinding
 
   public:
     TightBinding() { }
-    TightBinding(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh);
+    TightBinding(const int dim, const Vec2d &A, const std::vector<int> &kmesh) { init(dim, A, kmesh); }
     TightBinding(const TightBinding &tb) : Hk(tb.Hk), dim(tb.dim), A(tb.A), B(tb.B), K(tb.K), kSize(tb.kSize) { }
     virtual ~TightBinding() { }
 
@@ -34,24 +34,12 @@ class TightBinding
     const double operator()(const int b, const int c, const int k) const { return Hk[b][c][k].real(); }
     int size() const { return kSize; }
     void computeHk(const int Nb, const Map &hopT, const Vec2d &orbitals);
+    void init(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh);
 
   private:
     void genReciprocal();
     int  genKpoints(const std::vector<int> &kmesh);
 };
-
-
-TightBinding::TightBinding(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh) : dim{dim_}, A{A_}
-{
-  std::clog << "Constructing TB.\n";
-
-  B.resize(dim);
-  for (int d = 0; d < dim; d++)
-    B[d].resize(dim);
-
-  genReciprocal();
-  kSize = genKpoints(kmesh);
-}
 
 TightBinding& TightBinding::operator= (const TightBinding &tb)
 {
@@ -65,6 +53,21 @@ TightBinding& TightBinding::operator= (const TightBinding &tb)
   this->kSize = tb.kSize;
 
   return *this;
+}
+
+void TightBinding::init(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh)
+{
+  std::clog << "Constructing TB.\n";
+
+  dim = dim_;
+  A = A_;
+
+  B.resize(dim);
+  for (int d = 0; d < dim; d++)
+    B[d].resize(dim);
+
+  genReciprocal();
+  kSize = genKpoints(kmesh);
 }
 
 void TightBinding::genReciprocal()
