@@ -88,8 +88,13 @@ void Param<bool>::read(std::istream &is, const std::string &s, char delim)
     std::string sTF;
     if (delim == '\0') is >> sTF;
     else               is.ignore(ssMax,delim) >> sTF;
-    std::transform(sTF.begin(), sTF.end(), sTF.begin(), ::tolower);
-    std::istringstream(sTF) >> std::boolalpha >> value;
+
+    if (sTF.find_first_not_of("0123456789") == std::string::npos)
+      std::istringstream(sTF) >> value;
+    else {
+      std::transform(sTF.begin(), sTF.end(), sTF.begin(), ::tolower);
+      std::istringstream(sTF) >> std::boolalpha >> value;
+    }
   }
 }
 
