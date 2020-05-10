@@ -137,25 +137,23 @@ void TightBinding::computeHk(const int Nb, const Map &hopT, const Vec2d &orbital
       Hk[b][c].resize(kSize);
   }
 
+  std::vector<double> delta(dim);
   #pragma omp parallel for
   for (int k = 0; k < kSize; k++) {
     for (int b = 0; b < Nb; b++) {
       for (int c = 0; c < Nb; c++) {
         compdb ekbc{Maths::cz};
         for (auto &t : hopT) {
-          std::vector<double> delta(dim);
-          for (int d = 0; d < dim; d++)
-            delta[d] = t.first[d]+orbitals[b][d]-orbitals[c][d];
-
-          std::vector<double> r(dim,0.);
           for (int i = 0; i < dim; i++)
+            delta[i] = t.first[i]+orbitals[b][i]-orbitals[c][i];
+
+          double kr = 0.0;
+          for (int i = 0; i < dim; i++) {
+            double r = 0.0; // \vec{r}_i = \sum_j^D \vec{\d}_j A_{ji}
             for (int j = 0; j < dim; j++)
-              r[i] += delta[j]*A[j][i];
-
-          double kr{0.};
-          for (int d = 0; d < dim; d++)
-            kr += K[k][d]*r[d];
-
+              r += delta[j]*A[j][i];
+            kr += K[k][i]*r;
+          }
           ekbc += t.second[b][c]*compdb{std::cos(kr),-std::sin(kr)};
         }
         Hk[b][c][k] = ekbc;
