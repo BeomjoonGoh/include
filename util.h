@@ -54,6 +54,7 @@ namespace Util {
   void getComment(std::ifstream &inf, const std::string &inputf);
   std::string unindent(const char *p);
   std::string ordinal(const int i);
+  int wordCount(const std::string &text);
   static const char ordinalSuffixes[][3] = {"th", "st", "nd", "rd"};
 
 }
@@ -186,6 +187,14 @@ std::string Util::ordinal(const int i)
   if (ord > 3)
     ord = 0;
   return std::to_string(i)+std::string{ordinalSuffixes[ord]};
+}
+
+int Util::wordCount(const std::string &text)
+{
+  int size = 0;
+  std::string word;
+  for (std::stringstream s(text); s >> std::ws >> word; size++);
+  return size;
 }
 
 
