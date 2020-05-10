@@ -24,8 +24,9 @@ class ParamBase
 template <typename T>
 class Param : public ParamBase
 {
-  private:
+  public:
     const std::string name;
+  private:
     T value;
     bool assigned;
   public:
@@ -66,6 +67,15 @@ void Param<T>::print(std::ostream &os) const
   os << std::setw(10) << name;
   os.unsetf(std::ios_base::adjustfield);
   os << " = " << value;
+}
+
+template <>
+void Param<bool>::print(std::ostream &os) const
+{
+  os.setf(std::ios::left,std::ios_base::adjustfield);
+  os << std::setw(10) << name;
+  os.unsetf(std::ios_base::adjustfield);
+  os << " = " << std::boolalpha << value << std::noboolalpha;
 }
 
 template <typename T>
