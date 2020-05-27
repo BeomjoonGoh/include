@@ -35,7 +35,8 @@ class Mat
     T* begin() const { return m; }
     T* end() const { return m+N2; }
 
-    void inverse(Mat<T> &Ainv);
+    void inverse(Mat<T> &Ainv) const;
+    void inverse();
     void eigen(Mat<T> &QT, T* E) const;
 };
 
@@ -78,17 +79,34 @@ inline void Mat<T>::resize(int N_)
 }
 
 template <typename T>
-inline void Mat<T>::inverse(Mat<T> &Ainv)
+inline void Mat<T>::inverse(Mat<T> &Ainv) const
 {
   Ainv = *this;
+  int *IPIV = new int[Ainv.N];
+  int LWORK = Ainv.N2;
+  T *WORK = new T[LWORK];
+  int INFO;
+
+  LAPACK::xgetrf_(&Ainv.N,&Ainv.N,Ainv.m,&Ainv.N,IPIV,&INFO);
+  if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
+  LAPACK::xgetri_(&Ainv.N,Ainv.m,&Ainv.N,IPIV,WORK,&LWORK,&INFO);
+  if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
+
+  delete[] IPIV;
+  delete[] WORK;
+}
+
+template <typename T>
+inline void Mat<T>::inverse()
+{
   int *IPIV = new int[N];
   int LWORK = N2;
   T *WORK = new T[LWORK];
   int INFO;
 
-  LAPACK::xgetrf_(&N,&N,Ainv.m,&N,IPIV,&INFO);
+  LAPACK::xgetrf_(&N,&N,m,&N,IPIV,&INFO);
   if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
-  LAPACK::xgetri_(&N,Ainv.m,&N,IPIV,WORK,&LWORK,&INFO);
+  LAPACK::xgetri_(&N,m,&N,IPIV,WORK,&LWORK,&INFO);
   if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
 
   delete[] IPIV;
