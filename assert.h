@@ -1,6 +1,7 @@
 #ifndef ASSERT_H
 #define ASSERT_H
 
+#include <iostream>
 #include <cstdlib>
 
 #define RED(mess)       "\033[01;38;5;210m" << (mess) << " \033[0m"
@@ -13,14 +14,14 @@
 
 #define quit() {\
   std::cerr << BLUE("QUIT HERE >")<<__FILE__<<":"<<__LINE__<<" In function '"<<__func__<<"'"<< std::endl;\
-  std::exit(1);\
+  std::exit(EXIT_FAILURE);\
 }
 
 #define quitif(cond, mess) {\
   if ((cond)) { \
     std::cerr << RED("QUIT!") << "since " << "(" #cond ")\n" \
     << __FILE__ << ":" << __LINE__ << " In function '" << __func__ << "': " << mess << std::endl; \
-    std::exit(1);\
+    std::exit(EXIT_FAILURE);\
   }\
 }
 
@@ -29,7 +30,7 @@
     if (!(cond)) { \
       std::cerr << RED("Assertion!") << "(" #cond ") failed. \n" \
                 << __FILE__ << ":" << __LINE__ << " In function '" << __func__ << "': " << mess << std::endl; \
-      std::exit(1);\
+      std::exit(EXIT_FAILURE);\
     }\
   }
 
@@ -37,7 +38,7 @@
     if (!(cond)) { \
       std::cerr << RED("Assertion!") << "(" #cond ") failed. \n" \
                 << __FILE__ << ":" << __LINE__ << " In function '" << __func__ << "'" << std::endl; \
-      std::exit(1);\
+      std::exit(EXIT_FAILURE);\
     }\
   }
 #else
