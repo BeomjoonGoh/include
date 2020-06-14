@@ -12,6 +12,7 @@ template <typename T> std::vector<T> operator*(const std::vector<T> &v, T a);
 template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v);
 
 template <typename T> T sum(const std::vector<T> &v);
+template <typename T> T product(const std::vector<T> &v);
 template <typename T> T dot(const std::vector<T> &v, const std::vector<T> &w);
 template <typename T> std::vector<T> cross(const std::vector<T> &v, const std::vector<T> &w);
 
@@ -33,7 +34,7 @@ template <typename T> std::vector<T> operator+(const std::vector<T> &v, T a)
   return vec;
 }
 
-template <typename T> std::vector<T> operator+(T a, const std::vector<T> &v) { v + a; }
+template <typename T> std::vector<T> operator+(T a, const std::vector<T> &v) { return v + a; }
 
 template <typename T> std::vector<T> operator*(const std::vector<T> &v, const std::vector<T> &w)
 {
@@ -51,7 +52,7 @@ template <typename T> std::vector<T> operator*(const std::vector<T> &v, T a)
   return vec;
 }
 
-template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v) { v * a; }
+template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v) { return v * a; }
 
 template <typename T> T sum(const std::vector<T> &v)
 {
@@ -59,6 +60,14 @@ template <typename T> T sum(const std::vector<T> &v)
   for (auto &i : v)
     sum += i;
   return sum;
+}
+
+template <typename T> T product(const std::vector<T> &v)
+{
+  T prod {1};
+  for (auto &i : v)
+    prod *= i;
+  return prod;
 }
 
 template <typename T> T dot(const std::vector<T> &v, const std::vector<T> &w)
