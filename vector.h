@@ -2,6 +2,7 @@
 #define VECTOR_H
 
 #include <vector>
+#include <numeric>
 #include "assert.h"
 
 template <typename T> std::vector<T> operator+(const std::vector<T> &v, const std::vector<T> &w);
@@ -56,42 +57,24 @@ template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v) { r
 
 template <typename T> T sum(const std::vector<T> &v)
 {
-  T sum {0};
-  for (auto &i : v)
-    sum += i;
-  return sum;
+  return std::accumulate(v.begin(), v.end(), T(0));
 }
 
 template <typename T> T product(const std::vector<T> &v)
 {
-  T prod {1};
-  for (auto &i : v)
-    prod *= i;
-  return prod;
+  return std::accumulate(v.begin(), v.end(), T(1), std::multiplies<T>());
 }
 
 template <typename T> T dot(const std::vector<T> &v, const std::vector<T> &w)
 {
   assert0(v.size() == w.size());
-  T sum {0};
-  for (int i = 0; i < v.size(); i++)
-    sum += v[i]*w[i];
-  return sum;
+  return std::inner_product(v.begin(), v.end(), w.begin(), T(0));
 }
-
-//template <typename T> double dot(const std::vector<T> &v, const std::vector<T> &w)
-//{
-//  assert0(v.size() == w.size());
-//  T sum {0};
-//  for (int i = 0; i < v.size(); i++)
-//    sum += (conj(v[i]) * w[i]).real();
-//  return sum;
-//}
 
 template <typename T> std::vector<T> cross(const std::vector<T> &v, const std::vector<T> &w)
 {
   assert( (v.size() == 3 && v.size() == w.size()), "Cross product: only 3d!");
-  return std::vector<T> {v[1]*w[2] - v[2]*w[1], v[2]*w[0] - v[0]*w[2], v[0]*w[1] - v[1]*w[0]} ;
+  return std::vector<T>{v[1]*w[2] - v[2]*w[1], v[2]*w[0] - v[0]*w[2], v[0]*w[1] - v[1]*w[0]};
 }
 
 #endif /* end of include guard VECTOR_H */
