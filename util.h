@@ -8,6 +8,10 @@
 #include <string>
 #include <chrono>
 #include <cmath>
+#include <unistd.h>
+#include <sys/wait.h>
+
+#include "assert.h"
 
 namespace Util {
   class Logging
@@ -49,22 +53,19 @@ namespace Util {
       friend std::ostream& operator<< (std::ostream &oS, const outV &A);
       std::string str();
   };
-
   std::ostream& operator<< (std::ostream &oS, const outV &A);
+
+  void runCommand(const std::string &command);
+
   void getComment(std::ifstream &inf, const std::string &inputf);
   std::string unindent(const char *p);
   std::string ordinal(const int i);
   int wordCount(const std::string &text);
-  static const char ordinalSuffixes[][3] = {"th", "st", "nd", "rd"};
-
 }
 
 void Util::Logging::init(std::string logfileName, std::ios_base::openmode mode)
 {
-  if (is_on) {
-    std::cerr << "Util::Logging nested initialization." << std::endl;
-    std::exit(1);
-  }
+  quitif(is_on, "Util::Logging nested initialization.");
 
   if (logfileName == "STDERR") return;
   is_on = true;
@@ -90,7 +91,7 @@ std::string Util::Timer::elapsed()
   std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - m_start;
 
   double i0;
-  double d = modf(elapsed_seconds.count(),&i0);
+  double d = std::modf(elapsed_seconds.count(),&i0);
   int i = static_cast<int>(i0);
 
   int h = i/3600;
@@ -149,6 +150,42 @@ std::string Util::outV::str()
   return oss.str();
 }
 
+void Util::runCommand(const std::string &command)
+{
+  std::clog << "Util::runCommand(\"" << command << "\")\n";
+  std::cout.flush();
+  std::clog.flush();
+
+  int size = Util::wordCount(command);
+  std::string pieces[size];
+  const char* argv[size+1];
+
+  std::stringstream s(command);
+  for (int i = 0; s >> std::ws >> pieces[i]; i++)
+    argv[i] = pieces[i].c_str();
+  argv[size] = NULL;
+
+  pid_t pid = fork();
+  if (pid == 0) { // child
+    execv(argv[0], const_cast<char* const *>(argv));
+    quitif(true, RED("child") << ": execv failed to run");
+  } else if (pid > 0) { // parent 
+    int status_child;
+    if (waitpid(pid, &status_child, 0) > 0) {
+      if (WIFEXITED(status_child)) {
+        switch (WEXITSTATUS(status_child)) { 
+          case 0:   { std::clog << "parent: process terminated with zero returned." << std::endl; break; }
+          case 127: quitif(true, RED("parent") << ": execv failed.");
+          default:  quitif(true, RED("parent") << ": process terminated with non-zero returned.");
+        }
+      } else
+        quitif(true, RED("parent") << ": process terminated abnormally.");
+    } else
+      quitif(true, RED("parent") << ": waitpid failed.");
+  } else
+    quitif(true, "Failed to fork.");
+}
+
 void Util::getComment(std::ifstream &inf, const std::string &inputf)
 {
   inf.clear();                    // forget we hit the end of file
@@ -156,7 +193,7 @@ void Util::getComment(std::ifstream &inf, const std::string &inputf)
   if (inf.peek() == '#') {
     std::clog << "Comment from " << inputf << " :\n";
     std::string strInput;
-    getline(inf, strInput);
+    std::getline(inf, strInput);
     std::clog << "   " << strInput << '\n';
   }
 }
@@ -180,6 +217,7 @@ std::string Util::unindent(const char *p)
 
 std::string Util::ordinal(const int i)
 {
+  const char ordinalSuffixes[][3] = {"th", "st", "nd", "rd"};
   int ord = i % 100;
   if (ord / 10 == 1)
     ord = 0;
