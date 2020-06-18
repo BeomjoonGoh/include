@@ -81,96 +81,144 @@ inline void Mat<T>::resize(int N_)
 template <typename T>
 inline void Mat<T>::inverse(Mat<T> &Ainv) const
 {
-  Ainv = *this;
-  int *IPIV = new int[Ainv.N];
-  int LWORK = Ainv.N2;
-  T *WORK = new T[LWORK];
-  int INFO;
+  switch (N) {
+    case 1: {
+      Ainv.m[0] = 1./m[0];
+      break;
+    }
+    case 2: {
+      T detinv = 1./(m[0]*m[3] - m[1]*m[2]);
+      Ainv.m[0] =  detinv*m[3];
+      Ainv.m[1] = -detinv*m[1];
+      Ainv.m[2] = -detinv*m[2];
+      Ainv.m[3] =  detinv*m[0];
+      break;
+    }
+    case 3: {
+      T detinv = 1./(m[0]*m[4]*m[8] - m[0]*m[5]*m[7] - m[1]*m[3]*m[8] + m[1]*m[5]*m[6] + m[2]*m[3]*m[7] - m[2]*m[4]*m[6]);
+      Ainv.m[0] =  detinv*(m[4]*m[8] - m[5]*m[7]);
+      Ainv.m[1] = -detinv*(m[1]*m[8] - m[2]*m[7]);
+      Ainv.m[2] =  detinv*(m[1]*m[5] - m[2]*m[4]);
+      Ainv.m[3] = -detinv*(m[3]*m[8] - m[5]*m[6]);
+      Ainv.m[4] =  detinv*(m[0]*m[8] - m[2]*m[6]);
+      Ainv.m[5] = -detinv*(m[0]*m[5] - m[2]*m[3]);
+      Ainv.m[6] =  detinv*(m[3]*m[7] - m[4]*m[6]);
+      Ainv.m[7] = -detinv*(m[0]*m[7] - m[1]*m[6]);
+      Ainv.m[8] =  detinv*(m[0]*m[4] - m[1]*m[3]);
+      break;
+    }
+    case 4: {
+      T detinv = 1/(m[ 0]*(m[ 5]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[13] - m[ 9]*m[15]) + m[ 7]*(m[ 9]*m[14] - m[10]*m[13]))
+                  - m[ 1]*(m[ 4]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[14] - m[10]*m[12]))
+                  + m[ 2]*(m[ 4]*(m[ 9]*m[15] - m[11]*m[13]) + m[ 5]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[13] - m[ 9]*m[12]))
+                  - m[ 3]*(m[ 4]*(m[ 9]*m[14] - m[10]*m[13]) + m[ 5]*(m[10]*m[12] - m[ 8]*m[14]) + m[ 6]*(m[ 8]*m[13] - m[ 9]*m[12])));
+      Ainv.m[ 0] = detinv*(m[ 5]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[13] - m[ 9]*m[15]) + m[ 7]*(m[ 9]*m[14] - m[10]*m[13]));
+      Ainv.m[ 1] = detinv*(m[ 1]*(m[11]*m[14] - m[10]*m[15]) + m[ 2]*(m[ 9]*m[15] - m[11]*m[13]) + m[ 3]*(m[10]*m[13] - m[ 9]*m[14]));
+      Ainv.m[ 2] = detinv*(m[ 1]*(m[ 6]*m[15] - m[ 7]*m[14]) + m[ 2]*(m[ 7]*m[13] - m[ 5]*m[15]) + m[ 3]*(m[ 5]*m[14] - m[ 6]*m[13]));
+      Ainv.m[ 3] = detinv*(m[ 1]*(m[ 7]*m[10] - m[ 6]*m[11]) + m[ 2]*(m[ 5]*m[11] - m[ 7]*m[ 9]) + m[ 3]*(m[ 6]*m[ 9] - m[ 5]*m[10]));
+      Ainv.m[ 4] = detinv*(m[ 4]*(m[11]*m[14] - m[10]*m[15]) + m[ 6]*(m[ 8]*m[15] - m[11]*m[12]) + m[ 7]*(m[10]*m[12] - m[ 8]*m[14]));
+      Ainv.m[ 5] = detinv*(m[ 0]*(m[10]*m[15] - m[11]*m[14]) + m[ 2]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 3]*(m[ 8]*m[14] - m[10]*m[12]));
+      Ainv.m[ 6] = detinv*(m[ 0]*(m[ 7]*m[14] - m[ 6]*m[15]) + m[ 2]*(m[ 4]*m[15] - m[ 7]*m[12]) + m[ 3]*(m[ 6]*m[12] - m[ 4]*m[14]));
+      Ainv.m[ 7] = detinv*(m[ 0]*(m[ 6]*m[11] - m[ 7]*m[10]) + m[ 2]*(m[ 7]*m[ 8] - m[ 4]*m[11]) + m[ 3]*(m[ 4]*m[10] - m[ 6]*m[ 8]));
+      Ainv.m[ 8] = detinv*(m[ 4]*(m[ 9]*m[15] - m[11]*m[13]) + m[ 5]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[13] - m[ 9]*m[12]));
+      Ainv.m[ 9] = detinv*(m[ 0]*(m[11]*m[13] - m[ 9]*m[15]) + m[ 1]*(m[ 8]*m[15] - m[11]*m[12]) + m[ 3]*(m[ 9]*m[12] - m[ 8]*m[13]));
+      Ainv.m[10] = detinv*(m[ 0]*(m[ 5]*m[15] - m[ 7]*m[13]) + m[ 1]*(m[ 7]*m[12] - m[ 4]*m[15]) + m[ 3]*(m[ 4]*m[13] - m[ 5]*m[12]));
+      Ainv.m[11] = detinv*(m[ 0]*(m[ 7]*m[ 9] - m[ 5]*m[11]) + m[ 1]*(m[ 4]*m[11] - m[ 7]*m[ 8]) + m[ 3]*(m[ 5]*m[ 8] - m[ 4]*m[ 9]));
+      Ainv.m[12] = detinv*(m[ 4]*(m[10]*m[13] - m[ 9]*m[14]) + m[ 5]*(m[ 8]*m[14] - m[10]*m[12]) + m[ 6]*(m[ 9]*m[12] - m[ 8]*m[13]));
+      Ainv.m[13] = detinv*(m[ 0]*(m[ 9]*m[14] - m[10]*m[13]) + m[ 1]*(m[10]*m[12] - m[ 8]*m[14]) + m[ 2]*(m[ 8]*m[13] - m[ 9]*m[12]));
+      Ainv.m[14] = detinv*(m[ 0]*(m[ 6]*m[13] - m[ 5]*m[14]) + m[ 1]*(m[ 4]*m[14] - m[ 6]*m[12]) + m[ 2]*(m[ 5]*m[12] - m[ 4]*m[13]));
+      Ainv.m[15] = detinv*(m[ 0]*(m[ 5]*m[10] - m[ 6]*m[ 9]) + m[ 1]*(m[ 6]*m[ 8] - m[ 4]*m[10]) + m[ 2]*(m[ 4]*m[ 9] - m[ 5]*m[ 8]));
+      break;
+    }
+    default: {
+      Ainv = *this;
+      int *IPIV = new int[Ainv.N];
+      int LWORK = Ainv.N2;
+      T *WORK = new T[LWORK];
+      int INFO;
 
-  LAPACK::xgetrf_(&Ainv.N,&Ainv.N,Ainv.m,&Ainv.N,IPIV,&INFO);
-  if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
-  LAPACK::xgetri_(&Ainv.N,Ainv.m,&Ainv.N,IPIV,WORK,&LWORK,&INFO);
-  if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
+      LAPACK::xgetrf_(&Ainv.N,&Ainv.N,Ainv.m,&Ainv.N,IPIV,&INFO);
+      if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
+      LAPACK::xgetri_(&Ainv.N,Ainv.m,&Ainv.N,IPIV,WORK,&LWORK,&INFO);
+      if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
 
-  delete[] IPIV;
-  delete[] WORK;
+      delete[] IPIV;
+      delete[] WORK;
+      break;
+    }
+  }
 }
 
 template <typename T>
 inline void Mat<T>::inverse()
 {
   switch (N) { 
-    case 1:
-      {
-        m[0] = 1./m[0];
-        break;
-      }
-    case 2:
-      {
-        T detinv = 1./(m[0]*m[3] - m[1]*m[2]);
-        T t = m[0]; m[0] = m[3]; m[3] = t;
-        m[0] *=  detinv;
-        m[1] *= -detinv;
-        m[2] *= -detinv;
-        m[3] *=  detinv;
-        break;
-      }
-    case 3:
-      {
-        T detinv = 1./(m[0]*m[4]*m[8] - m[0]*m[5]*m[7] - m[1]*m[3]*m[8] + m[1]*m[5]*m[6] + m[2]*m[3]*m[7] - m[2]*m[4]*m[6]);
-        Mat<T> t(*this);
-        m[0] =  detinv*(t[4]*t[8] - t[5]*t[7]);
-        m[1] = -detinv*(t[1]*t[8] - t[2]*t[7]);
-        m[2] =  detinv*(t[1]*t[5] - t[2]*t[4]);
-        m[3] = -detinv*(t[3]*t[8] - t[5]*t[6]);
-        m[4] =  detinv*(t[0]*t[8] - t[2]*t[6]);
-        m[5] = -detinv*(t[0]*t[5] - t[2]*t[3]);
-        m[6] =  detinv*(t[3]*t[7] - t[4]*t[6]);
-        m[7] = -detinv*(t[0]*t[7] - t[1]*t[6]);
-        m[8] =  detinv*(t[0]*t[4] - t[1]*t[3]);
-        break;
-      }
-    case 4:
-      {
-        T detinv = 1/(m[ 0]*(m[ 5]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[13] - m[ 9]*m[15]) + m[ 7]*(m[ 9]*m[14] - m[10]*m[13]))
-                    - m[ 1]*(m[ 4]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[14] - m[10]*m[12]))
-                    + m[ 2]*(m[ 4]*(m[ 9]*m[15] - m[11]*m[13]) + m[ 5]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[13] - m[ 9]*m[12]))
-                    - m[ 3]*(m[ 4]*(m[ 9]*m[14] - m[10]*m[13]) + m[ 5]*(m[10]*m[12] - m[ 8]*m[14]) + m[ 6]*(m[ 8]*m[13] - m[ 9]*m[12])));
-        Mat<T> t(*this);
-        m[ 0] = detinv*(t[ 5]*(t[10]*t[15] - t[11]*t[14]) + t[ 6]*(t[11]*t[13] - t[ 9]*t[15]) + t[ 7]*(t[ 9]*t[14] - t[10]*t[13]));
-        m[ 1] = detinv*(t[ 1]*(t[11]*t[14] - t[10]*t[15]) + t[ 2]*(t[ 9]*t[15] - t[11]*t[13]) + t[ 3]*(t[10]*t[13] - t[ 9]*t[14]));
-        m[ 2] = detinv*(t[ 1]*(t[ 6]*t[15] - t[ 7]*t[14]) + t[ 2]*(t[ 7]*t[13] - t[ 5]*t[15]) + t[ 3]*(t[ 5]*t[14] - t[ 6]*t[13]));
-        m[ 3] = detinv*(t[ 1]*(t[ 7]*t[10] - t[ 6]*t[11]) + t[ 2]*(t[ 5]*t[11] - t[ 7]*t[ 9]) + t[ 3]*(t[ 6]*t[ 9] - t[ 5]*t[10]));
-        m[ 4] = detinv*(t[ 4]*(t[11]*t[14] - t[10]*t[15]) + t[ 6]*(t[ 8]*t[15] - t[11]*t[12]) + t[ 7]*(t[10]*t[12] - t[ 8]*t[14]));
-        m[ 5] = detinv*(t[ 0]*(t[10]*t[15] - t[11]*t[14]) + t[ 2]*(t[11]*t[12] - t[ 8]*t[15]) + t[ 3]*(t[ 8]*t[14] - t[10]*t[12]));
-        m[ 6] = detinv*(t[ 0]*(t[ 7]*t[14] - t[ 6]*t[15]) + t[ 2]*(t[ 4]*t[15] - t[ 7]*t[12]) + t[ 3]*(t[ 6]*t[12] - t[ 4]*t[14]));
-        m[ 7] = detinv*(t[ 0]*(t[ 6]*t[11] - t[ 7]*t[10]) + t[ 2]*(t[ 7]*t[ 8] - t[ 4]*t[11]) + t[ 3]*(t[ 4]*t[10] - t[ 6]*t[ 8]));
-        m[ 8] = detinv*(t[ 4]*(t[ 9]*t[15] - t[11]*t[13]) + t[ 5]*(t[11]*t[12] - t[ 8]*t[15]) + t[ 7]*(t[ 8]*t[13] - t[ 9]*t[12]));
-        m[ 9] = detinv*(t[ 0]*(t[11]*t[13] - t[ 9]*t[15]) + t[ 1]*(t[ 8]*t[15] - t[11]*t[12]) + t[ 3]*(t[ 9]*t[12] - t[ 8]*t[13]));
-        m[10] = detinv*(t[ 0]*(t[ 5]*t[15] - t[ 7]*t[13]) + t[ 1]*(t[ 7]*t[12] - t[ 4]*t[15]) + t[ 3]*(t[ 4]*t[13] - t[ 5]*t[12]));
-        m[11] = detinv*(t[ 0]*(t[ 7]*t[ 9] - t[ 5]*t[11]) + t[ 1]*(t[ 4]*t[11] - t[ 7]*t[ 8]) + t[ 3]*(t[ 5]*t[ 8] - t[ 4]*t[ 9]));
-        m[12] = detinv*(t[ 4]*(t[10]*t[13] - t[ 9]*t[14]) + t[ 5]*(t[ 8]*t[14] - t[10]*t[12]) + t[ 6]*(t[ 9]*t[12] - t[ 8]*t[13]));
-        m[13] = detinv*(t[ 0]*(t[ 9]*t[14] - t[10]*t[13]) + t[ 1]*(t[10]*t[12] - t[ 8]*t[14]) + t[ 2]*(t[ 8]*t[13] - t[ 9]*t[12]));
-        m[14] = detinv*(t[ 0]*(t[ 6]*t[13] - t[ 5]*t[14]) + t[ 1]*(t[ 4]*t[14] - t[ 6]*t[12]) + t[ 2]*(t[ 5]*t[12] - t[ 4]*t[13]));
-        m[15] = detinv*(t[ 0]*(t[ 5]*t[10] - t[ 6]*t[ 9]) + t[ 1]*(t[ 6]*t[ 8] - t[ 4]*t[10]) + t[ 2]*(t[ 4]*t[ 9] - t[ 5]*t[ 8]));
-        break;
-      }
-    default:
-      {
-        int *IPIV = new int[N];
-        int LWORK = N2;
-        T *WORK = new T[LWORK];
-        int INFO;
+    case 1: {
+      m[0] = 1./m[0];
+      break;
+    }
+    case 2: {
+      T detinv = 1./(m[0]*m[3] - m[1]*m[2]);
+      T t = m[0]; m[0] = m[3]; m[3] = t;
+      m[0] *=  detinv;
+      m[1] *= -detinv;
+      m[2] *= -detinv;
+      m[3] *=  detinv;
+      break;
+    }
+    case 3: {
+      T detinv = 1./(m[0]*m[4]*m[8] - m[0]*m[5]*m[7] - m[1]*m[3]*m[8] + m[1]*m[5]*m[6] + m[2]*m[3]*m[7] - m[2]*m[4]*m[6]);
+      Mat<T> t(*this);
+      m[0] =  detinv*(t[4]*t[8] - t[5]*t[7]);
+      m[1] = -detinv*(t[1]*t[8] - t[2]*t[7]);
+      m[2] =  detinv*(t[1]*t[5] - t[2]*t[4]);
+      m[3] = -detinv*(t[3]*t[8] - t[5]*t[6]);
+      m[4] =  detinv*(t[0]*t[8] - t[2]*t[6]);
+      m[5] = -detinv*(t[0]*t[5] - t[2]*t[3]);
+      m[6] =  detinv*(t[3]*t[7] - t[4]*t[6]);
+      m[7] = -detinv*(t[0]*t[7] - t[1]*t[6]);
+      m[8] =  detinv*(t[0]*t[4] - t[1]*t[3]);
+      break;
+    }
+    case 4: {
+      T detinv = 1/(m[ 0]*(m[ 5]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[13] - m[ 9]*m[15]) + m[ 7]*(m[ 9]*m[14] - m[10]*m[13]))
+                  - m[ 1]*(m[ 4]*(m[10]*m[15] - m[11]*m[14]) + m[ 6]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[14] - m[10]*m[12]))
+                  + m[ 2]*(m[ 4]*(m[ 9]*m[15] - m[11]*m[13]) + m[ 5]*(m[11]*m[12] - m[ 8]*m[15]) + m[ 7]*(m[ 8]*m[13] - m[ 9]*m[12]))
+                  - m[ 3]*(m[ 4]*(m[ 9]*m[14] - m[10]*m[13]) + m[ 5]*(m[10]*m[12] - m[ 8]*m[14]) + m[ 6]*(m[ 8]*m[13] - m[ 9]*m[12])));
+      Mat<T> t(*this);
+      m[ 0] = detinv*(t[ 5]*(t[10]*t[15] - t[11]*t[14]) + t[ 6]*(t[11]*t[13] - t[ 9]*t[15]) + t[ 7]*(t[ 9]*t[14] - t[10]*t[13]));
+      m[ 1] = detinv*(t[ 1]*(t[11]*t[14] - t[10]*t[15]) + t[ 2]*(t[ 9]*t[15] - t[11]*t[13]) + t[ 3]*(t[10]*t[13] - t[ 9]*t[14]));
+      m[ 2] = detinv*(t[ 1]*(t[ 6]*t[15] - t[ 7]*t[14]) + t[ 2]*(t[ 7]*t[13] - t[ 5]*t[15]) + t[ 3]*(t[ 5]*t[14] - t[ 6]*t[13]));
+      m[ 3] = detinv*(t[ 1]*(t[ 7]*t[10] - t[ 6]*t[11]) + t[ 2]*(t[ 5]*t[11] - t[ 7]*t[ 9]) + t[ 3]*(t[ 6]*t[ 9] - t[ 5]*t[10]));
+      m[ 4] = detinv*(t[ 4]*(t[11]*t[14] - t[10]*t[15]) + t[ 6]*(t[ 8]*t[15] - t[11]*t[12]) + t[ 7]*(t[10]*t[12] - t[ 8]*t[14]));
+      m[ 5] = detinv*(t[ 0]*(t[10]*t[15] - t[11]*t[14]) + t[ 2]*(t[11]*t[12] - t[ 8]*t[15]) + t[ 3]*(t[ 8]*t[14] - t[10]*t[12]));
+      m[ 6] = detinv*(t[ 0]*(t[ 7]*t[14] - t[ 6]*t[15]) + t[ 2]*(t[ 4]*t[15] - t[ 7]*t[12]) + t[ 3]*(t[ 6]*t[12] - t[ 4]*t[14]));
+      m[ 7] = detinv*(t[ 0]*(t[ 6]*t[11] - t[ 7]*t[10]) + t[ 2]*(t[ 7]*t[ 8] - t[ 4]*t[11]) + t[ 3]*(t[ 4]*t[10] - t[ 6]*t[ 8]));
+      m[ 8] = detinv*(t[ 4]*(t[ 9]*t[15] - t[11]*t[13]) + t[ 5]*(t[11]*t[12] - t[ 8]*t[15]) + t[ 7]*(t[ 8]*t[13] - t[ 9]*t[12]));
+      m[ 9] = detinv*(t[ 0]*(t[11]*t[13] - t[ 9]*t[15]) + t[ 1]*(t[ 8]*t[15] - t[11]*t[12]) + t[ 3]*(t[ 9]*t[12] - t[ 8]*t[13]));
+      m[10] = detinv*(t[ 0]*(t[ 5]*t[15] - t[ 7]*t[13]) + t[ 1]*(t[ 7]*t[12] - t[ 4]*t[15]) + t[ 3]*(t[ 4]*t[13] - t[ 5]*t[12]));
+      m[11] = detinv*(t[ 0]*(t[ 7]*t[ 9] - t[ 5]*t[11]) + t[ 1]*(t[ 4]*t[11] - t[ 7]*t[ 8]) + t[ 3]*(t[ 5]*t[ 8] - t[ 4]*t[ 9]));
+      m[12] = detinv*(t[ 4]*(t[10]*t[13] - t[ 9]*t[14]) + t[ 5]*(t[ 8]*t[14] - t[10]*t[12]) + t[ 6]*(t[ 9]*t[12] - t[ 8]*t[13]));
+      m[13] = detinv*(t[ 0]*(t[ 9]*t[14] - t[10]*t[13]) + t[ 1]*(t[10]*t[12] - t[ 8]*t[14]) + t[ 2]*(t[ 8]*t[13] - t[ 9]*t[12]));
+      m[14] = detinv*(t[ 0]*(t[ 6]*t[13] - t[ 5]*t[14]) + t[ 1]*(t[ 4]*t[14] - t[ 6]*t[12]) + t[ 2]*(t[ 5]*t[12] - t[ 4]*t[13]));
+      m[15] = detinv*(t[ 0]*(t[ 5]*t[10] - t[ 6]*t[ 9]) + t[ 1]*(t[ 6]*t[ 8] - t[ 4]*t[10]) + t[ 2]*(t[ 4]*t[ 9] - t[ 5]*t[ 8]));
+      break;
+    }
+    default: {
+      int *IPIV = new int[N];
+      int LWORK = N2;
+      T *WORK = new T[LWORK];
+      int INFO;
 
-        LAPACK::xgetrf_(&N,&N,m,&N,IPIV,&INFO);
-        if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
-        LAPACK::xgetri_(&N,m,&N,IPIV,WORK,&LWORK,&INFO);
-        if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
+      LAPACK::xgetrf_(&N,&N,m,&N,IPIV,&INFO);
+      if (INFO) std::cerr << "xgetrf Error: INFO = " << INFO << std::endl;
+      LAPACK::xgetri_(&N,m,&N,IPIV,WORK,&LWORK,&INFO);
+      if (INFO) std::cerr << "xgetri Error: INFO = " << INFO << std::endl;
 
-        delete[] IPIV;
-        delete[] WORK;
-        break;
-      }
+      delete[] IPIV;
+      delete[] WORK;
+      break;
+    }
   }
 }
 
