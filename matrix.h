@@ -16,7 +16,7 @@ class Mat
   public:
     Mat(int N_ = 0) : N(N_), N2(N_*N_) { m = (N) ? new T[N2] : nullptr; }
     Mat(const Mat<T> &A) { N = A.N; N2 = A.N2; m = new T[N2]; std::copy(A.m, A.m+A.N2, m); }
-    virtual ~Mat() { delete[] m; m = nullptr; }
+    ~Mat() { delete[] m; m = nullptr; }
 
     Mat<T>& operator= (const Mat<T> &A);
     T& operator()(const int i, const int j)             { assert(0<=i && i<N && 0<=j && j<N,"i,j="<<i<<","<<j<<" N="<<N); return m[i*N+j]; }

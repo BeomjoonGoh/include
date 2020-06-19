@@ -17,7 +17,7 @@ class Rand
 
   public:
     Rand(unsigned long long j);
-    virtual ~Rand() { }
+    ~Rand() { }
 
     unsigned long long  int64();
     double              doub();

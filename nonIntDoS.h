@@ -33,7 +33,7 @@ class Dos
     Dos() : T{nullptr}, one{1.0-absEpsilon} { }
     Dos(int d_, int N_, double t) : T{nullptr}, one{1.0-absEpsilon} { init(d_, N_, t); }
     Dos(const Dos &dos);
-    virtual ~Dos() { delete[] T; T = nullptr;}
+    ~Dos() { delete[] T; T = nullptr;}
 
     Dos& operator= (const Dos &dos);
     double& operator[] (const int i) { return D[i]; }
@@ -228,7 +228,7 @@ inline double Dos::ImagG0(double om_)
       if (om < T[0])
         return fac/sqrt(1.0-Maths::min(one, sqr(om/T[0])));
       return 0.0;
-      }
+    }
     case 2: {
       if (om < T[0])
         return fac*Ellip::complete1(Maths::min(one, sqrt((T[1]-om)*(T[1]+om))/T[1]));

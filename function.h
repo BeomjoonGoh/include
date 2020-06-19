@@ -26,7 +26,7 @@ class F1d
     F1d(int N_);
     F1d(int N_, T vi);
     F1d(const F1d<T> &f);
-    virtual ~F1d() { delete[] v; v = nullptr;}
+    ~F1d() { delete[] v; v = nullptr;}
 
     // operators {{{
     T& operator[] (const int i) { assert(0<=i && i<N, "i="<<i<<" N="<< N); return v[i]; }
@@ -106,7 +106,7 @@ class F2d
     F2d(int Nd_, int N_, T vi);
     F2d(int Nd_, const F1d<T> &f);
     F2d(const F2d<T> &F);
-    virtual ~F2d() { operator delete(mem); mem = nullptr; }
+    ~F2d() { operator delete(mem); mem = nullptr; }
 
     // operators {{{
     F1d<T>& operator[] (const int i) { assert(0<=i && i<Nd, "i="<<i<< " Nd="<<Nd); return v[i]; }

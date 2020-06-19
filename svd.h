@@ -20,7 +20,7 @@ class SVD
 
   public:
     SVD(const F2d<double> &A);
-    virtual ~SVD() { }
+    ~SVD() { }
 
     void solve(const F1d<double> &b, F1d<double> &x, double thresh = -1.);
     void solve(const F2d<double> &b, F2d<double> &x, double thresh = -1.);

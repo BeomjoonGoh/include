@@ -17,7 +17,7 @@ class Coeff
     bool linear;
   
     Coeff() { }
-    virtual ~Coeff() { }
+    ~Coeff() { }
 
     void init(const double z, const M1d &x, int &ii);
     void calculate_0(const double z, const M1d &x, int &ii);
@@ -44,7 +44,7 @@ class Moments
   public:
     Moments() { }
     Moments(const F1d<T> &f, const M1d &x);
-    virtual ~Moments() { }
+    ~Moments() { }
 
     void Set(const F1d<T> &f, const M1d &x);
     void init(const Coeff &c);

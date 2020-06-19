@@ -11,7 +11,7 @@ class baseE
   public:
     baseE(double r_ = 0, double t_ = 0) : r(r_), t(t_) { }
     baseE(const baseE& z) : r(z.r), t(z.t) { }
-    virtual ~baseE() { }
+    ~baseE() { }
 
     //friend baseE operator- (const baseE& z) { return baseE(-z.r,z.t);};
     baseE operator- () const { return baseE(-r, t); }

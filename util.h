@@ -36,7 +36,7 @@ namespace Util {
       std::chrono::time_point<std::chrono::system_clock> m_start;
     public:
       Timer() : m_start{std::chrono::system_clock::now()} { }
-      virtual ~Timer() { }
+      ~Timer() { }
       std::string elapsed();
       static std::string currentTD();
   };
@@ -49,7 +49,7 @@ namespace Util {
       double *f;
     public:
       template <typename Container> outV(const Container &v, const int wid_=0, const char t='\0');
-      virtual ~outV() { delete[] f; }
+      ~outV() { delete[] f; }
       friend std::ostream& operator<< (std::ostream &oS, const outV &A);
       std::string str();
   };

@@ -31,7 +31,7 @@ class Param : public ParamBase
     bool assigned;
   public:
     Param(const std::string &name_, const T &value_) : name(name_), value(value_), assigned(false) { }
-    virtual ~Param() { }
+    ~Param() { }
 
     operator T() const { return value; } // implicit conversion
 

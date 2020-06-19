@@ -96,7 +96,7 @@ class Maths::QuadEq
 
   public:
     QuadEq(double a, double b, double c, double x0_) : C{a,b,c}, x0{x0_} { }
-    virtual ~QuadEq() { }
+    ~QuadEq() { }
     double operator()(const double x);
     int solve(double &x1, double &x2);
 };

@@ -44,7 +44,7 @@ class DErule
 
   public:
     DErule(functor &f_, double a_, double b_, double H = 3.7) : f(f_), a{a_}, b{b_}, hmax{H}, n{0}, sum{0.0} { }
-    virtual ~DErule() { }
+    ~DErule() { }
 
     int    level() { return n; }
     double value() { return sum; }

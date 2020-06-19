@@ -16,7 +16,7 @@ class Lorentz
   public:
     Lorentz() : x0{0}, g{1}, P{0}, exist{false} { }
     Lorentz(double x0_, double g_, double P_) : x0{x0_}, g{g_}, P{P_}, exist{true} { }
-    virtual ~Lorentz() { }
+    ~Lorentz() { }
 
     double operator()(double w);
 

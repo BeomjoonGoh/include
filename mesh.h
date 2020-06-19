@@ -29,7 +29,7 @@ class M1d
     M1d() : N{0}, dN{0}, x{nullptr}, Dx{nullptr}, D1x{nullptr} { }
     M1d(int N_);
     M1d(const M1d &m);
-    virtual ~M1d();
+    ~M1d();
 
     M1d& operator= (const M1d &m);
 
@@ -89,7 +89,7 @@ class AddLogTan
     static const double solMin, solMax, solTol;
     
     AddLogTan(double dwt_, double xt_) : dwt{dwt_}, xt{xt_} { }
-    virtual ~AddLogTan() { }
+    ~AddLogTan() { }
     double operator() (double u);
 };
 
@@ -99,7 +99,7 @@ class Interp {
     double d;
     Interp() : j{0}, d{0.0} { }
     Interp(int j_, double d_) : j{j_}, d{d_} { }
-    virtual ~Interp() { }
+    ~Interp() { }
 };
 
 

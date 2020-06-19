@@ -38,7 +38,7 @@ class FitSVD
     template <class functor>
     FitSVD(const M1d &x, const F1d<double> &y, functor &f, const double TOL = 1.e-12);
 
-    virtual ~FitSVD() { }
+    ~FitSVD() { }
 
     void fit();
     friend std::ostream& operator<<(std::ostream &oS, const FitSVD &f);
@@ -133,7 +133,7 @@ class Polynomial
     int n;
   public:
     Polynomial(int n_) : n{n_+1} { }
-    virtual ~Polynomial() { }
+    ~Polynomial() { }
     F1d<double> operator()(const double x)
     { 
       F1d<double> p{n};

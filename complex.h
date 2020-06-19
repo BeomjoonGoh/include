@@ -12,7 +12,7 @@ class compdb
   public:
     compdb(double r = 0, double i = 0) : re{r}, im{i} { }
     compdb(const compdb &z) : re{z.re}, im{z.im} { }
-    ~compdb() { } // No virtual here: it adds 8 bytes so that sizeof(compdb) = 24.
+    ~compdb() { }
 
     compdb operator- () const;
 

@@ -27,7 +27,7 @@ class TightBinding
     TightBinding() { }
     TightBinding(const int dim, const Vec2d &A, const std::vector<int> &kmesh) { init(dim, A, kmesh); }
     TightBinding(const TightBinding &tb) : Hk(tb.Hk), dim(tb.dim), A(tb.A), B(tb.B), K(tb.K), kSize(tb.kSize) { }
-    virtual ~TightBinding() { }
+    ~TightBinding() { }
 
     TightBinding& operator= (const TightBinding &tb);
     double operator()(const int b, const int c, const int k) { return Hk[b][c][k].real(); }
