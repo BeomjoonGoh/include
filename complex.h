@@ -12,9 +12,6 @@ class compdb
   public:
     compdb(double r = 0, double i = 0) : re{r}, im{i} { }
     compdb(const compdb &z) : re{z.re}, im{z.im} { }
-    ~compdb() { }
-
-    compdb operator- () const;
 
     compdb& operator=  (const compdb &z);
     compdb& operator=  (const double r);
@@ -26,6 +23,7 @@ class compdb
     compdb& operator*= (const double r);
     compdb& operator/= (const compdb &z);
     compdb& operator/= (const double r);
+    compdb operator- () const;
 
     friend bool operator== (const compdb &x, const compdb &y);
     friend bool operator!= (const compdb &x, const compdb &y);
@@ -55,7 +53,6 @@ class compdb
     double real() const { return re; }
     double imag() const { return im; }
     compdb conj() const { return compdb(re,-im); }
-
 
     friend double real(const compdb &z) { return z.re; }
     friend double imag(const compdb &z) { return z.im; }
