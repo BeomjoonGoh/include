@@ -1,9 +1,0 @@
-1) for debugging information and less optimazation, give compiler option: -O1 -g
-2) run
-$ valgrind --leak-check=full --show-reachable=yes --show-leak-kinds=all --track-origins=yes --verbose --suppressions="suppresions.txt" --log-file="logfile" program arguments
-3) note:
-  a.  Still reachables are pseudo leaks.
-  b.  If openmp is enabled and used, there might be definitely or possibly lost memories by pthread_create@@GLIBC in
-      libpthread, by ??? in libgomp. It seems this is not a real problem.
-  c.  See the manual at www.valgrind.org
-
