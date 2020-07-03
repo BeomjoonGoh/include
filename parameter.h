@@ -35,7 +35,7 @@ class Param : public ParamBase
 
     operator T() const { return value; } // implicit conversion
 
-    void assign(const T &p) { value = p; }
+    void assign(const T &p) { value = p; assigned = true; }
     bool isAssigned() const { return assigned; }
     void print(std::ostream &os) const;
     void read(std::istream &is, const std::string &s, char delim);
