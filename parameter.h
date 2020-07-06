@@ -15,7 +15,6 @@ class ParamBase
   public:
     ParamBase() { }
     virtual ~ParamBase() { }
-
     virtual bool isAssigned() const = 0;
     virtual void print(std::ostream &os) const = 0;
     virtual void read(std::istream &is, const std::string &s, char delim) = 0;
@@ -35,10 +34,13 @@ class Param : public ParamBase
 
     operator T() const { return value; } // implicit conversion
 
+    bool isAssigned() const override{ return assigned; }
+    void print(std::ostream &os) const override;
+    void read(std::istream &is, const std::string &s, char delim) override;
+
     void assign(const T &p) { value = p; assigned = true; }
-    bool isAssigned() const { return assigned; }
-    void print(std::ostream &os) const;
-    void read(std::istream &is, const std::string &s, char delim);
+    template<typename U> U read_(std::istream &is, char delim);
+    void print_(std::ostream &os) const;
 };
 
 class ParamSet
@@ -63,41 +65,54 @@ template <typename T, typename U> std::istream& operator>> (std::istream &is,   
 template <typename T>
 void Param<T>::print(std::ostream &os) const
 {
-  os.setf(std::ios::left,std::ios_base::adjustfield);
-  os << std::setw(10) << name;
-  os.unsetf(std::ios_base::adjustfield);
+  print_(os);
   os << " = " << value;
 }
 
 template <>
 void Param<bool>::print(std::ostream &os) const
 {
+  print_(os);
+  os << " = " << std::boolalpha << value << std::noboolalpha;
+}
+
+template <>
+void Param<std::string>::print(std::ostream &os) const
+{
+  print_(os);
+  os << " = \"" << value << "\"";
+}
+
+template <>
+void Param<char>::print(std::ostream &os) const
+{
+  print_(os);
+  os << " = \'" << value << "\'";
+}
+
+template <typename T>
+void Param<T>::print_(std::ostream &os) const
+{
   os.setf(std::ios::left,std::ios_base::adjustfield);
   os << std::setw(10) << name;
   os.unsetf(std::ios_base::adjustfield);
-  os << " = " << std::boolalpha << value << std::noboolalpha;
 }
 
 template <typename T>
 void Param<T>::read(std::istream &is, const std::string &s, char delim)
 {
-  const int ssMax = 2000;
   if (s == name) {
     assigned = true;
-    if (delim == '\0') is >> value;
-    else               is.ignore(ssMax,delim) >> value;
+    value = read_<T>(is, delim);
   }
 }
 
 template <>
 void Param<bool>::read(std::istream &is, const std::string &s, char delim)
 {
-  const int ssMax = 2000;
   if (s == name) {
     assigned = true;
-    std::string sTF;
-    if (delim == '\0') is >> sTF;
-    else               is.ignore(ssMax,delim) >> sTF;
+    std::string sTF = read_<std::string>(is, delim);
 
     if (sTF.find_first_not_of("0123456789") == std::string::npos)
       std::istringstream(sTF) >> value;
@@ -106,6 +121,39 @@ void Param<bool>::read(std::istream &is, const std::string &s, char delim)
       std::istringstream(sTF) >> std::boolalpha >> value;
     }
   }
+}
+
+template <>
+void Param<std::string>::read(std::istream &is, const std::string &s, char delim)
+{
+  if (s == name) {
+    assigned = true;
+    value = read_<std::string>(is, delim);
+    value.erase(remove(value.begin(), value.end(), '\"'), value.end());
+    value.erase(remove(value.begin(), value.end(), '\''), value.end());
+  }
+}
+
+template <>
+void Param<char>::read(std::istream &is, const std::string &s, char delim)
+{
+  if (s == name) {
+    assigned = true;
+    std::string schar = read_<std::string>(is, delim);
+    schar.erase(remove(schar.begin(), schar.end(), '\''), schar.end());
+    value = schar[0];
+  }
+}
+
+template <typename T>
+template <typename U>
+U Param<T>::read_(std::istream &is, char delim)
+{
+  U val;
+  const int ssMax = 2000;
+  if (delim == '\0') is >> val;
+  else               is.ignore(ssMax,delim) >> val;
+  return val;
 }
 
 // ParamSet
