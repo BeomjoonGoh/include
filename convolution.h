@@ -212,10 +212,10 @@ void Conv::makeAverage(double z, const M1d &om, Moments<T> &M, F1d<T> &A)
   M.init(c);
   c.calculate_0(z, om, ii);
   A[0] = M.getAxdx_j(c, om);
-    for (int j = 1; j < om.size()-1; j++) {
-      c.calculate_j(z, j, om, ii);
-      A[j] = M.getAxdx_j(c, om);
-    }
+  for (int j = 1; j < om.size()-1; j++) {
+    c.calculate_j(z, j, om, ii);
+    A[j] = M.getAxdx_j(c, om);
+  }
   c.calculate_N(z, om);
   A[om.size()-1] = M.getAxdx_N(c, om);
 }
@@ -224,6 +224,7 @@ template <typename T>
 inline T Conv::convolute(const F1d<T> &g, const F1d<T> &A)
 { // Instead, use BLAS DGEMM with F2d g, F2d A?
   // or use BLAS DDOT with F1d g, F1d A? 
+  // or std::inner_product(F1d g, F1d A, 0.0)?
   assert0(g.size() == A.size());
   T sum(0);
   for (int i = 0; i < g.size(); i++)
