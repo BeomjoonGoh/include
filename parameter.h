@@ -94,7 +94,7 @@ template <typename T>
 void Param<T>::print_(std::ostream &os) const
 {
   os.setf(std::ios::left,std::ios_base::adjustfield);
-  os << std::setw(10) << name;
+  os << std::setw(15) << name;
   os.unsetf(std::ios_base::adjustfield);
 }
 
