@@ -73,7 +73,7 @@ template <>
 void Param<bool>::print(std::ostream &os) const
 {
   print_(os);
-  os << " = " << std::boolalpha << value << std::noboolalpha;
+  os << " = " << (value ? "True" : "False"); // python
 }
 
 template <>
