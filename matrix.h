@@ -37,7 +37,7 @@ class Mat
 
     void inverse(Mat<T> &Ainv) const;
     void inverse();
-    void eigen(Mat<T> &QT, T* E) const;
+    void eigen(Mat<T> &QT, double* E) const;
 };
 
 template <typename T>
@@ -237,6 +237,25 @@ inline void Mat<double>::eigen(Mat<double> &QT, double* E) const
 
   delete[] WORK;
   assert(INFO == 0, "Error: dgeev returned error code " << INFO);
+}
+
+template <typename T>
+inline void Mat<T>::eigen(Mat<T> &QT, double* E) const
+{
+  QT = *this;
+  char JOBZ='V';
+  char UPLO='L';
+  int LWORK = 2*N-1;
+  T *WORK = new T[LWORK];
+  double *RWORK = new double[3*N-2];
+  int INFO;
+  int N_ = N;
+
+  LAPACK::zheev_(&JOBZ, &UPLO, &N_, QT.m, &N_, E, WORK, &LWORK, RWORK, &INFO);
+
+  delete[] WORK;
+  delete[] RWORK;
+  assert(INFO == 0, "Error: zheev returned error code " << INFO);
 }
 
 #endif /* end of include guard: MATRIX_H */
