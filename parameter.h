@@ -53,7 +53,7 @@ class ParamSet
     ~ParamSet() { }
 
     void Log(std::ostream &os, const std::string &name);
-    bool Read(const std::string &inputf, char delim = '\0');
+    bool read(const std::string &inputf, char delim = '\0');
 };
 
 template <typename T> std::ostream& operator<< (std::ostream &os, const std::vector<T> &v);
@@ -171,7 +171,7 @@ void ParamSet::Log(std::ostream &os, const std::string &name)
   os << "============================================================\n";
 }
 
-bool ParamSet::Read(const std::string &inputf, char delim)
+bool ParamSet::read(const std::string &inputf, char delim)
 {
   if (readbefore) {
     std::cerr << "Don't read more than once!\n";

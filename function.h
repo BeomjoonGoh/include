@@ -74,10 +74,10 @@ class F1d
     double Rms();
     template <typename U> friend double normalizedDiff(const F1d<U> &f1, const F1d<U> &f2);
 
-    template <typename M1d> void Print(const M1d &x, const std::string &outputf, const std::string &comment = "");
-    void Print(const std::string &outputf, const std::string &comment = "");
-    bool Read(const std::string &inputf, const std::string &descrip = "");
-    template <typename M1d> bool Readx(M1d &x, const std::string &inputf, const std::string &descrip = "");
+    template <typename M1d> void print(const M1d &x, const std::string &outputf, const std::string &comment = "");
+    void print(const std::string &outputf, const std::string &comment = "");
+    bool read(const std::string &inputf, const std::string &descrip = "");
+    template <typename M1d> bool readx(M1d &x, const std::string &inputf, const std::string &descrip = "");
 
     template <typename U, typename M1d>
     friend F1d<U> kramerskronig(const M1d &x, const F1d<U> &f);
@@ -160,10 +160,10 @@ class F2d
     double Rms();
     template <typename U> friend double normalizedDiff(const F2d<U> &F1, const F2d<U> &F2);
 
-    template <typename M1d> void Print(const M1d &x, const std::string &outputf, const std::string &comment = "");
-    bool Read(const std::string &inputf, const std::string &descrip = "");
-    bool Readr(const std::string &inputf);
-    template <typename M1d> bool Readx(M1d &x, const std::string &inputf, const std::string &descrip = "");
+    template <typename M1d> void print(const M1d &x, const std::string &outputf, const std::string &comment = "");
+    bool read(const std::string &inputf, const std::string &descrip = "");
+    bool readr(const std::string &inputf);
+    template <typename M1d> bool readx(M1d &x, const std::string &inputf, const std::string &descrip = "");
 
     template <typename U, typename M1d> friend F2d<U>
     kramerskronig(const M1d &x, const F2d<U> &F);
@@ -472,7 +472,7 @@ double normalizedDiff(const F1d<compdb> &f1, const F1d<compdb> &f2)
 
 template <typename T>
 template <typename M1d>
-void F1d<T>::Print(const M1d &x, const std::string &outputf, const std::string &comment) {
+void F1d<T>::print(const M1d &x, const std::string &outputf, const std::string &comment) {
   assert0(x.size() == N);
   std::clog << "  => Function printed: " << outputf << "\n";
 
@@ -485,7 +485,7 @@ void F1d<T>::Print(const M1d &x, const std::string &outputf, const std::string &
 }
 
 template <typename T>
-void F1d<T>::Print(const std::string &outputf, const std::string &comment)
+void F1d<T>::print(const std::string &outputf, const std::string &comment)
 {
   std::ofstream outf{outputf};
   if (comment != "")
@@ -496,7 +496,7 @@ void F1d<T>::Print(const std::string &outputf, const std::string &comment)
 }
 
 template <typename T>
-bool F1d<T>::Read(const std::string &inputf, const std::string &descrip)
+bool F1d<T>::read(const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << " from " << inputf << ", with " << N << " entries.\n";
 
@@ -524,7 +524,7 @@ bool F1d<T>::Read(const std::string &inputf, const std::string &descrip)
 
 template <typename T>
 template <typename M1d>
-bool F1d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip)
+bool F1d<T>::readx(M1d &x, const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << "with mesh from " << inputf << "\n";
 
@@ -1192,7 +1192,7 @@ double normalizedDiff(const F2d<T> &F1, const F2d<T> &F2)
 
 template <typename T>
 template <typename M1d>
-void F2d<T>::Print(const M1d &x, const std::string &outputf, const std::string &comment)
+void F2d<T>::print(const M1d &x, const std::string &outputf, const std::string &comment)
 {
   assert0(x.size() == N);
   std::clog << "  => Function printed: " << outputf << "\n";
@@ -1211,7 +1211,7 @@ void F2d<T>::Print(const M1d &x, const std::string &outputf, const std::string &
 }
 
 template <typename T>
-bool F2d<T>::Read(const std::string &inputf, const std::string &descrip)
+bool F2d<T>::read(const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << " from " << inputf << ", with " << Nd <<"x" << N << " entries.\n";
 
@@ -1240,7 +1240,7 @@ bool F2d<T>::Read(const std::string &inputf, const std::string &descrip)
 }
 
 template <typename T>
-bool F2d<T>::Readr(const std::string &inputf)
+bool F2d<T>::readr(const std::string &inputf)
 {
   std::clog << "Reading " << inputf << ", with " << Nd <<"x" << N << " entries in the row major fashion.\n";
 
@@ -1268,7 +1268,7 @@ bool F2d<T>::Readr(const std::string &inputf)
 
 template <typename T>
 template <typename M1d>
-bool F2d<T>::Readx(M1d &x, const std::string &inputf, const std::string &descrip)
+bool F2d<T>::readx(M1d &x, const std::string &inputf, const std::string &descrip)
 {
   std::clog << "Reading " << descrip << " with mesh from " << inputf << "\n";
   if (Nd <= 0) {

@@ -74,8 +74,8 @@ class M1d
     using locateFcn = int (M1d::*)(double,int&) const;
     Interp getInterp(const double a, int &i, locateFcn locate) const;
 
-    bool Read(const std::string &inputf);
-    void Print(const std::string &outputf, const std::string &comment = "");
+    bool read(const std::string &inputf);
+    void print(const std::string &outputf, const std::string &comment = "");
 
   private:
     int bisection(double a, int &jl, int &ju) const;
@@ -482,7 +482,7 @@ inline Interp M1d::getInterp(const double a, int &i, locateFcn locate) const
   return Interp{j,d};
 }
 
-bool M1d::Read(const std::string &inputf)
+bool M1d::read(const std::string &inputf)
 {
   std::ifstream inf{inputf};
   if (!inf.good()) {
@@ -516,7 +516,7 @@ bool M1d::Read(const std::string &inputf)
   return true;
 }
 
-void M1d::Print(const std::string &outputf, const std::string &comment)
+void M1d::print(const std::string &outputf, const std::string &comment)
 {
   std::ofstream outf{outputf};
   if (comment != "")

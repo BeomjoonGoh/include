@@ -46,7 +46,7 @@ class Dos
     void setDos();
     double RealG0(double om);
     double ImagG0(double om);
-    void Print(const std::string &outputf, const std::string &comment = "") { D.Print(ep,outputf,comment); } 
+    void print(const std::string &outputf, const std::string &comment = "") { D.print(ep,outputf,comment); } 
 
 };
 
@@ -261,7 +261,7 @@ void DMFT::readDos(string inputf)
   F2d<double> Dos;
   M1d ep;
   Dos.resize(Nb);
-  if (!Dos.Readx(ep,inputf,"non-interacting D density of states")) {
+  if (!Dos.readx(ep,inputf,"non-interacting D density of states")) {
     TightBinding tb{Param::dim, Param::latUnitVec, Param::kmesh};
     tb.computeHk(Nb, Param::hopT, Param::orbitals);
     kSize = tb.size();
@@ -300,7 +300,7 @@ void DMFT::readDos(string inputf)
       ep[e] = om[e+m0];
     ep.Set();
 
-    Dos.Print(ep,inputf,Param::HamInfo());
+    Dos.print(ep,inputf,Param::HamInfo());
   }
 }
 */
