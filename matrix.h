@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <initializer_list>
+#include <cmath>
 #include "assert.h"
 #include "lapackWrap.h"
 
@@ -16,6 +18,7 @@ class Mat
   public:
     Mat(int N_ = 0) : N(N_), N2(N_*N_) { m = (N) ? new T[N2] : nullptr; }
     Mat(const Mat<T> &A) { N = A.N; N2 = A.N2; m = new T[N2]; std::copy(A.m, A.m+A.N2, m); }
+    Mat(std::initializer_list<T> l);
     ~Mat() { delete[] m; m = nullptr; }
 
     Mat<T>& operator= (const Mat<T> &A);
@@ -41,6 +44,15 @@ class Mat
 };
 
 template <typename T>
+Mat<T>::Mat(std::initializer_list<T> l)
+{
+  N2 = l.size();
+  N = static_cast<int>(std::sqrt(N2));
+  m = new T[N2];
+  std::copy(l.begin(), l.end(), m);
+}
+
+template <typename T>
 inline Mat<T>& Mat<T>::operator= (const Mat<T> &A)
 {
   if (this == &A)
@@ -60,7 +72,8 @@ inline std::ostream& operator<< (std::ostream &oS, const Mat<T> &A)
 }
 
 template <typename T>
-inline std::istream& operator>> (std::istream &iS, Mat<T> &A){
+inline std::istream& operator>> (std::istream &iS, Mat<T> &A)
+{
   for (int i = 0; i < A.N2; i++) 
     iS >> A.m[i];
   return iS;
