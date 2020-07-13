@@ -28,12 +28,13 @@ class F1d
     F1d(const F1d<T> &f);
     ~F1d() { delete[] v; v = nullptr;}
 
-    // operators {{{
+    // operators
+    F1d<T>& operator=  (const F1d<T> &f);
     T& operator[] (const int i) { assert(0<=i && i<N, "i="<<i<<" N="<< N); return v[i]; }
     const T& operator[] (const int i) const { assert(0<=i && i<N, "i="<<i<<" N="<<N); return v[i]; }
 
+    /*
     F1d<T> operator- () const;
-    F1d<T>& operator=  (const F1d<T> &f);
     F1d<T>& operator+= (const F1d<T> &f);
     F1d<T>& operator+= (const T &a);
     F1d<T>& operator-= (const F1d<T> &f);
@@ -55,7 +56,7 @@ class F1d
     template <typename U> friend F1d<U> operator/ (const F1d<U> &f1, const F1d<U> &f2);
     template <typename U> friend F1d<U> operator/ (const F1d<U> &f, const U &a);
     template <typename U> friend F1d<U> operator/ (const U &a, const F1d<U> &f);
-    // operators }}}
+    */
 
     T* begin() const {return v;}
     T* end() const {return v+N;}
@@ -108,14 +109,15 @@ class F2d
     F2d(const F2d<T> &F);
     ~F2d() { operator delete(mem); mem = nullptr; }
 
-    // operators {{{
+    // operators
+    F2d<T>& operator=  (const F2d<T> &F);
     F1d<T>& operator[] (const int i) { assert(0<=i && i<Nd, "i="<<i<< " Nd="<<Nd); return v[i]; }
     const F1d<T>& operator[] (const int i) const { assert(0<=i && i<Nd, "i="<<i<< " Nd="<<Nd); return v[i]; }
     T& operator()(const int i, const int j) { assert(0<=i && i<Nd && 0<=j && j<N,"i,j="<<i<<","<<j<<" Nd,N="<<Nd<<","<<N); return v[i][j]; }
     const T& operator()(const int i, const int j) const { assert(0<=i && i<Nd && 0<=j && j<N,"i,j="<<i<<","<<j<<" Nd,N="<<Nd<<","<<N); return v[i][j]; }
 
+    /*
     F2d<T> operator- () const;
-    F2d<T>& operator=  (const F2d<T> &F);
     F2d<T>& operator+= (const F2d<T> &F);
     F2d<T>& operator+= (const F1d<T> &f);
     F2d<T>& operator+= (const T &a);
@@ -149,7 +151,7 @@ class F2d
     template <typename U> friend F2d<U> operator/ (const F1d<U> &f1, const F2d<U> &F2);
     template <typename U> friend F2d<U> operator/ (const F2d<U> &F, const U &a);
     template <typename U> friend F2d<U> operator/ (const U &a, const F2d<U> &F);
-    // operators }}}
+    */
 
     T* begin() {return (*v).begin();}
 
@@ -199,15 +201,6 @@ inline F1d<T>::F1d(const F1d<T> &f)
 
 // ====== Operator overloadings
 template <typename T>
-inline F1d<T> F1d<T>::operator- () const
-{
-  F1d<T> f{this->N};
-  for (int i = 0; i < f.N; i++)
-    f.v[i] = -static_cast<T>(1)*this->v[i];
-  return f;
-}
-
-template <typename T>
 inline F1d<T>& F1d<T>::operator= (const F1d<T> &f)
 {
   if (this == &f)
@@ -215,6 +208,15 @@ inline F1d<T>& F1d<T>::operator= (const F1d<T> &f)
   resize(f.N);
   std::copy(f.v, f.v+f.N, this->v);
   return *this;
+}
+/*
+template <typename T>
+inline F1d<T> F1d<T>::operator- () const
+{
+  F1d<T> f{this->N};
+  for (int i = 0; i < f.N; i++)
+    f.v[i] = -static_cast<T>(1)*this->v[i];
+  return f;
 }
 
 template <typename T>
@@ -390,6 +392,7 @@ inline F1d<T> operator/ (const T &a, const F1d<T> &f)
   }
   return g;
 }
+*/
 
 template <typename T>
 inline void F1d<T>::resize(int N_)
@@ -783,17 +786,7 @@ inline F2d<T>::F2d(const F2d<T> &F)
     v[i].init(N, begins+i*N);
 }
 
-// ====== Operator overloadings {{{
-template <typename T>
-inline F2d<T> F2d<T>::operator- () const
-{
-  F2d<T> F{*this};
-  for (int i = 0; i < F.Nd; i++)
-    for (int j = 0; j < F.N; j++)
-      F(i,j) *= static_cast<T>(-1);
-  return F;
-}
-
+// ====== Operator overloadings
 template <typename T>
 inline F2d<T>& F2d<T>::operator= (const F2d<T> &F)
 {
@@ -820,6 +813,16 @@ inline F2d<T>& F2d<T>::operator= (const F2d<T> &F)
   }
 
   return *this;
+}
+/*
+template <typename T>
+inline F2d<T> F2d<T>::operator- () const
+{
+  F2d<T> F{*this};
+  for (int i = 0; i < F.Nd; i++)
+    for (int j = 0; j < F.N; j++)
+      F(i,j) *= static_cast<T>(-1);
+  return F;
 }
 
 template <typename T>
@@ -1137,7 +1140,7 @@ inline F2d<T> operator/ (const T &a, const F2d<T> &F)
   }
   return G;
 }
-// }}}
+*/
 
 template <typename T>
 inline void F2d<T>::resize(int Nd_, int N_)
