@@ -25,7 +25,7 @@ class Rand
     int                 intIn(const int a, const int b);
 };
 
-Rand::Rand(unsigned long long j) : v(4101842887655102017LL), w(1) 
+inline Rand::Rand(unsigned long long j) : v(4101842887655102017LL), w(1) 
 { // Constructor. Call with any integer seed (except the value of v above). An example of a seed:
   //  unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
   u = j^v;
