@@ -53,6 +53,7 @@ class M1d
 
     void makeEqDist(int N_, double a, double b);
     void makeTan   (int N_, double dx, double x1); // [-x1, x1]
+    void makeLog   (int N_, double x0, double x1); // [x0, x1]
     void makeLogTan(int N_, double x0, double x1, double x2, double alpha); // [x0, x2)
 
     void makeEqLogTan    (int N_, double x0, double x1, double x2, double alpha); // [-x2 ~ x2]
@@ -205,6 +206,16 @@ inline void M1d::makeTan(int N_, double dx, double x1)
   for (int i = 1; i < N-1; i++)
     x[i] = w*std::tan(a*(2.0*i/(N-1) - 1.0));
   x[N-1] = x1;
+  Set();
+}
+
+inline void M1d::makeLog(int N_, double x0, double x1)
+{ // x \in [x0, x1]
+  assert(x0 < x1, "x0,x1="<<x0<<","<<x1);
+  resize(N_);
+  double Dlogx = std::log(x1/x0);
+  for (int i = 0; i < N; i++)
+    x[i] = x0*std::exp(i*Dlogx/(N-1));
   Set();
 }
 
