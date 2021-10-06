@@ -6,7 +6,7 @@
 #include "maths.h"
 #include "function.h"
 #include "mesh.h"
-#include "gamma.h"
+#include "specialfunctions/gamma.h"
 #include "svd.h"
 
 class FitSVD
