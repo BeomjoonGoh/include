@@ -2,43 +2,41 @@
 #define TIGHTBINDING_H
 
 #include <map>
-#include "util.h"
 #include "maths.h"
 #include "complex.h"
 #include "vector.h"
+#include "matrix.h"
+#include "symmetry.h"
 
 class TightBinding
 { // Given hopping t matrix (hopT), unit vector A, kmesh for each axis, and positions of orbitals in terms of A,
   // calculates H_k by Fourier transformation.
-
-  using Vec2d = std::vector<std::vector<double>>;
-  using Map = std::map<std::vector<int>,std::vector<std::vector<double>>>;
-
   public:
-    std::vector<std::vector<std::vector<compdb>>> Hk;
+    std::vector<Mat<compdb>> Hk;
+    std::vector<double> weight;
+
   private:
     int dim;
-    Vec2d A;
-    Vec2d B;
-    Vec2d K;
-    int kSize;
+    std::vector<std::vector<double>> A;
+    std::vector<std::vector<double>> B;
+    std::vector<std::vector<double>> K;
 
   public:
     TightBinding() { }
-    TightBinding(const int dim, const Vec2d &A, const std::vector<int> &kmesh) { init(dim, A, kmesh); }
-    TightBinding(const TightBinding &tb) : Hk(tb.Hk), dim(tb.dim), A(tb.A), B(tb.B), K(tb.K), kSize(tb.kSize) { }
+    TightBinding(const std::vector<std::vector<double>> &A, int spaceGroup, const std::vector<int> &kmesh) { init(A, spaceGroup, kmesh); }
+    TightBinding(const TightBinding &tb) : Hk(tb.Hk), dim(tb.dim), A(tb.A), B(tb.B), K(tb.K) { }
     ~TightBinding() { }
 
     TightBinding& operator= (const TightBinding &tb);
-    double operator()(const int b, const int c, const int k) { return Hk[b][c][k].real(); }
-    const double operator()(const int b, const int c, const int k) const { return Hk[b][c][k].real(); }
-    int size() const { return kSize; }
-    void computeHk(const int Nb, const Map &hopT, const Vec2d &orbitals);
-    void init(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh);
+    int size() const { return Hk.size(); }
+    void init(const std::vector<std::vector<double>> &A_, int spaceGroup, const std::vector<int> &kmesh);
+    void init(const std::vector<std::vector<double>> &A_, const std::vector<std::vector<double>> &kpaths, int nkpath);
+    void computeHk(const std::map<std::vector<int>,std::vector<std::vector<double>>> &hopT, const std::vector<std::vector<double>> &orbitals);
 
   private:
     void genReciprocal();
-    int  genKpoints(const std::vector<int> &kmesh);
+    void genKpoints(Symmetry &sym, const std::vector<int> &kmesh);
+    void genKpaths(const std::vector<std::vector<double>> &kpaths, int nkpath);
 };
 
 TightBinding& TightBinding::operator= (const TightBinding &tb)
@@ -50,99 +48,171 @@ TightBinding& TightBinding::operator= (const TightBinding &tb)
   this->A = tb.A;
   this->B = tb.B;
   this->K = tb.K;
-  this->kSize = tb.kSize;
 
   return *this;
 }
 
-void TightBinding::init(const int dim_, const Vec2d &A_, const std::vector<int> &kmesh)
+void TightBinding::init(const std::vector<std::vector<double>> &A_, int spaceGroup, const std::vector<int> &kmesh)
 {
   std::clog << "Constructing TB.\n";
-
-  dim = dim_;
+  dim = A_.size();
   A = A_;
 
   B.resize(dim);
   for (int d = 0; d < dim; d++)
     B[d].resize(dim);
-
   genReciprocal();
-  kSize = genKpoints(kmesh);
+  Symmetry sym(dim, spaceGroup);
+  genKpoints(sym, kmesh);
+}
+
+void TightBinding::init(const std::vector<std::vector<double>> &A_, const std::vector<std::vector<double>> &kpaths, int nkpath)
+{
+  dim = A_.size();
+  A = A_;
+
+  B.resize(dim);
+  for (int d = 0; d < dim; d++)
+    B[d].resize(dim);
+  genReciprocal();
+  genKpaths(kpaths, nkpath);
 }
 
 void TightBinding::genReciprocal()
 {
-  if (dim==1) {
-    B[0][0] = 2*Maths::pi/A[0][0];
-  } else if (dim==2) { 
-    A[0].push_back(0.);
-    A[1].push_back(0.);
-    A.push_back(std::vector<double>{0.,0.,1.});
-    double volUC = dot(cross(A[0],A[1]),A[2]);
-    B[0] = cross(A[1],A[2]) * (2*Maths::pi/volUC);
-    B[1] = cross(A[2],A[0]) * (2*Maths::pi/volUC);
+  for (int d = dim; d < 3; d++) {
+    for (auto &a : A)
+      a.push_back(0.);
+    std::vector<double> a(d+1, 0.); a[d] = 1.;
+    A.push_back(a);
+  }
+  double fac = 2.0*Maths::pi/dot(cross(A[0],A[1]),A[2]);
+  for (int i = 0; i < dim; i++) {
+    B[i] = fac*cross(A[(i+1)%3], A[(i+2)%3]);
+    B[i].resize(dim);
+  }
+  for (int d = 3; d --> dim;) {
     A.pop_back();
-    for (int d = 0; d < dim; d++) {
-      A[d].pop_back();
-      B[d].pop_back();
-    }
-  } else if (dim==3) {
-    double volUC = dot(cross(A[0],A[1]),A[2]);
-    B[0] = cross(A[1],A[2]) * (2*Maths::pi/volUC);
-    B[1] = cross(A[2],A[0]) * (2*Maths::pi/volUC);
-    B[2] = cross(A[0],A[1]) * (2*Maths::pi/volUC);
+    for (auto &a : A)
+      a.pop_back();
   }
   std::clog << "Reciprocal lattice:\n";
-  for (auto &b : B)
-    std::clog << "   "  << Util::outV(b,15) << "\n";
+  for (auto &bi : B) {
+    std::clog << "   ";
+    for (auto &bij : bi)
+      std::clog << std::setw(15) << bij << ' ';
+    std::clog << "\n";
+  }
 }
 
-int TightBinding::genKpoints(const std::vector<int> &kmesh)
+void TightBinding::genKpoints(Symmetry &sym, const std::vector<int> &kmesh)
 {
-  std::vector<double> fac(dim);
-  if (dim==1) {
-    for (int k0 = 0; k0 < kmesh[0]; k0++) {
-      fac[0] = static_cast<double>(k0) / kmesh[0];
-      K.push_back(B[0]*fac[0]);
+  std::vector<int> n(dim);
+  auto index2point = [&](size_t I, std::vector<double> &p)
+  { // \vec{p} = B \vec{m}, m_i = n_i/N_i - 1/2, I = (n_1*N_2 + n_2)*N_3 + n_3 for d=3.
+    n[dim-1] = I % kmesh[dim-1];
+    for (int i = dim-1; i-->0;)
+      n[i] = (I/=kmesh[i+1])%kmesh[i];
+    for (int i = 0; i < dim; i++) {
+      p[i] = 0.0;
+      for (int j = 0; j < dim; j++)
+        p[i] += B[j][i]*(static_cast<double>(n[j])/kmesh[j] - 0.5);
     }
-  } else if (dim==2) {
-    for (int k0 = 0; k0 < kmesh[0]; k0++) {
-      fac[0] = static_cast<double>(k0) / kmesh[0];
-      for (int k1 = 0; k1 < kmesh[1]; k1++) {
-        fac[1] = static_cast<double>(k1) / kmesh[1];
-        K.push_back( B[0]*fac[0] + B[1]*fac[1] );
-      }
-    }
-  } else if (dim==3) {
-    for (int k0 = 0; k0 < kmesh[0]; k0++) {
-      fac[0] = static_cast<double>(k0) / kmesh[0];
-      for (int k1 = 0; k1 < kmesh[1]; k1++) {
-        fac[1] = static_cast<double>(k1) / kmesh[1];
-        for (int k2 = 0; k2 < kmesh[2]; k2++) {
-          fac[2] = static_cast<double>(k2) / kmesh[2];
-          K.push_back( B[0]*fac[0] + B[1]*fac[1] + B[2]*fac[2] );
+  };
+  auto point2index = [&](const std::vector<double> &p, size_t &I)
+  { // \vec{m} = \frac{1}{2\pi} A^T \vec{p}
+    for (int i = 0; i < dim; i++)
+      if ( (n[i] = std::round(0.5*kmesh[i]*(dot(A[i],p)/Maths::pi + 1.0))) >= kmesh[i] )
+        return false;
+    I = n[0];
+    for (int i = 1; i < dim; i++)
+      I = kmesh[i]*I + n[i];
+    return true;
+  };
+
+  std::vector<bool> fullK(product(kmesh), true); // faster than vector<int> in this case
+  double fullksize = static_cast<double>(fullK.size());
+  size_t estimateK = std::ceil(1.2*fullksize/sym.order());
+  K.reserve(estimateK);
+  weight.reserve(estimateK);
+
+  std::vector<double> p(dim);
+  for (size_t I = 0, J; I < fullK.size(); I++) {
+    if (fullK[I]) {
+      index2point(I,p);
+      sym.findSamePoints(p);
+      int w = 0;
+      for (auto &sp : sym.samePoints) {
+        if (point2index(sp,J) && fullK[J]) {
+          fullK[J] = false;
+          w++;
         }
       }
+      fullK[I] = true;
+      K.push_back(p);
+      weight.push_back(w/fullksize);
     }
   }
-  return K.size();
+  std::clog << "k-points generated: " << fullK.size() << " -> " << K.size() << " (1/" << fullksize/K.size() << ")" << std::endl;
 }
 
-void TightBinding::computeHk(const int Nb, const Map &hopT, const Vec2d &orbitals)
+void TightBinding::genKpaths(const std::vector<std::vector<double>> &kpaths, int nkpath)
 {
-  Hk.resize(Nb);
-  for (int b = 0; b < Nb; b++) {
-    Hk[b].resize(Nb);
-    for (int c = 0; c < Nb; c++)
-      Hk[b][c].resize(kSize);
+  std::vector<std::vector<double>> highsym(kpaths.size());
+  for (int l = 0; l < kpaths.size(); l++) {
+    highsym[l].resize(dim);
+    for (int i = 0; i < dim; i++) {
+      highsym[l][i] = 0.0;
+      for (int j = 0; j < dim; j++)
+        highsym[l][i] += kpaths[l][j]*B[j][i];
+    }
   }
+  std::vector<double> len(kpaths.size()-1);
+  double totlen = 0.0;
+  for (int l = 0; l < kpaths.size()-1; l++) {
+    len[l] = 0.0;
+    for (int i = 0; i < dim; i++)
+      len[l] += Maths::sqr(highsym[l+1][i] - highsym[l][i]);
+    len[l] = std::sqrt(len[l]);
+    totlen += len[l];
+  }
+  for (auto &n : len)
+    n = std::round(nkpath*n/totlen);
+
+  K.reserve(std::ceil(1.1*nkpath));
+  std::vector<double> p(dim), d(dim);
+  for (int l = 0; l < kpaths.size()-1; l++) {
+    for (int j = 0; j < dim; j++)
+      d[j] = (highsym[l+1][j] - highsym[l][j])/len[l];
+    for (int i = 0; i < static_cast<int>(len[l]); i++) {
+      for (int j = 0; j < dim; j++)
+        p[j] = highsym[l][j]+i*d[j];
+      K.push_back(p);
+    }
+  }
+  K.push_back(highsym.back());
+  std::clog << "k-points generated: " << K.size() << '\n';
+
+  int N = 0;
+  std::clog << "kpaths indices: " << N;
+  for (auto &n : len)
+    std::clog << ", " << (N+=static_cast<int>(n));
+  std::clog << std::endl;
+}
+
+void TightBinding::computeHk(const std::map<std::vector<int>,std::vector<std::vector<double>>> &hopT, const std::vector<std::vector<double>> &orbitals)
+{
+  int Nb = orbitals.size();
+  Hk.resize(K.size());
+  for (auto &hk : Hk)
+    hk.resize(Nb);
 
   std::vector<double> delta(dim);
-  #pragma omp parallel for
-  for (int k = 0; k < kSize; k++) {
+  for (int k = 0; k < K.size(); k++) {
     for (int b = 0; b < Nb; b++) {
       for (int c = 0; c < Nb; c++) {
-        compdb ekbc{Maths::cz};
+        compdb ekbc = Maths::cz;
+        Hk[k](b,c) = Maths::cz;
         for (auto &t : hopT) {
           for (int i = 0; i < dim; i++)
             delta[i] = t.first[i]+orbitals[b][i]-orbitals[c][i];
@@ -154,9 +224,19 @@ void TightBinding::computeHk(const int Nb, const Map &hopT, const Vec2d &orbital
               r += delta[j]*A[j][i];
             kr += K[k][i]*r;
           }
-          ekbc += t.second[b][c]*compdb{std::cos(kr),-std::sin(kr)};
+          ekbc += t.second[b][c]*compdb(std::cos(kr),-std::sin(kr));
+
+          //double kr_p = 0.0, kr_m = 0.0;
+          //for (int i = 0; i < dim; i++) {
+          //  for (int j = 0; j < dim; j++) {
+          //    kr_p += (+t.first[i]+orbitals[b][i]-orbitals[c][i])*A[i][j]*K[k][j];
+          //    kr_m += (-t.first[i]+orbitals[b][i]-orbitals[c][i])*A[i][j]*K[k][j];
+          //  }
+          //}
+          //Hk[k](b,c) += t.second[b][c]*compdb{std::cos(kr_p),-std::sin(kr_p)}
+          //              +t.second[c][b]*compdb{std::cos(kr_m),-std::sin(kr_m)};
         }
-        Hk[b][c][k] = ekbc;
+        Hk[k](b,c) = ekbc;
       }
     }
   }

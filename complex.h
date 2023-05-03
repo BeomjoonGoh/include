@@ -11,9 +11,9 @@ class compdb
     double re, im;
   public:
     compdb(double r = 0, double i = 0) : re{r}, im{i} { }
-    compdb(const compdb &z) : re{z.re}, im{z.im} { }
+    //compdb(const compdb &z) : re{z.re}, im{z.im} { }
 
-    compdb& operator=  (const compdb &z);
+    //compdb& operator=  (const compdb &z);
     compdb& operator=  (const double r);
     compdb& operator+= (const compdb &z);
     compdb& operator+= (const double r);
@@ -92,14 +92,14 @@ inline compdb compdb::operator-() const
   return compdb(-re,-im);
 }
 
-inline compdb& compdb::operator= (const compdb &z)
-{
-  if (this == &z)
-    return *this;
-  re = z.re;
-  im = z.im;
-  return *this;
-}
+//inline compdb& compdb::operator= (const compdb &z)
+//{
+//  if (this == &z)
+//    return *this;
+//  re = z.re;
+//  im = z.im;
+//  return *this;
+//}
 
 inline compdb& compdb::operator= (const double r)
 {

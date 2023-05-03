@@ -12,6 +12,8 @@
 
 #include <omp.h>
 
+using namespace Maths;
+
 class Dos
 { // Non interacting density of states of simple cupic lattice for 1, 2, and 3 dimension.
   // E. N. Economou, Green's Functions in Quantum Physics, 3rd Ed., (Springer, 2006), p. 87.
@@ -19,18 +21,17 @@ class Dos
   private:
     int d;
     int N;
-    double e0;
     double *T;
     F1d<double> D;
-    int w0, w1, w2;
+    int w0, w1;
     const double one;
 
   public:
     M1d ep;
 
   public:
-    Dos() : T{nullptr}, one{1.0-Maths::absEpsilon} { }
-    Dos(int d, int N, double e0, double t) : T{nullptr}, one{1.0-Maths::absEpsilon} { init(d, N, e0, t); }
+    Dos() : T{nullptr}, one{1.0-absEpsilon} { }
+    Dos(int d_, int N_, double t) : T{nullptr}, one{1.0-absEpsilon} { init(d_, N_, t); }
     Dos(const Dos &dos);
     ~Dos() { delete[] T; T = nullptr;}
 
@@ -40,12 +41,12 @@ class Dos
     double de(int i) const { return ep.dx(i); }
     double d1e(int i) const { return ep.d1x(i); }
 
-    void init(int d_, int N_, double e0_, double t);
+    void init(int d_, int N_, double t);
     int size() const { return N; }
     void setDos();
     double RealG0(double om);
     double ImagG0(double om);
-    void print(const std::string &outputf, const std::string &comment = "") { D.print(ep,outputf,comment); }
+    void print(const std::string &outputf, const std::string &comment = "") { D.print(ep,outputf,comment); } 
 
 };
 
@@ -70,7 +71,7 @@ class Func0 : public Func_Base
   // Note: K(1) happens if \e \in [0,2t] at \phi_c = \cos^{-1}(\e / 2t)
   public:
     Func0(double *T_, double one_, double e_) : Func_Base{T_, one_, e_} { }
-    double operator()(double phi, double dum) { return Ellip::complete1( Maths::min(one, sqrt(1-Maths::sqr(l(e, phi)))) ); }
+    double operator()(double phi, double dum) { return Ellip::complete1( Maths::min(one, sqrt(1-sqr(l(e, phi))))); }
 };
 
 class Func1 : public Func_Base
@@ -87,7 +88,7 @@ class Func2 : public Func_Base
   //                    if \e \in [-6t,-2t] at \phi_c = \cos^{-1}( \frac{\e + 4t}{2t} )
   public:
     Func2(double *T_, double one_, double e_) : Func_Base{T_, one_, e_} { }
-    double operator()(double phi, double dum) { return Ellip::complete1( Maths::min(one, Maths::abs(l(e,phi))) ); }
+    double operator()(double phi, double dum) { return Ellip::complete1( Maths::min(one, abs(l(e,phi))) ); }
 };
 
 class Func3 : public Func_Base
@@ -99,10 +100,10 @@ class Func3 : public Func_Base
 };
 //}}}
 
-Dos::Dos(const Dos &dos) : d(dos.d), N(dos.N), e0(dos.e0), T(dos.d ? new double[dos.d] : nullptr), D(dos.D),
-                           w0(dos.w0), w1(dos.w1), w2(dos.w2), one(dos.one), ep(dos.ep)
+Dos::Dos(const Dos &dos) : d(dos.d), N(dos.N), T(dos.d ? new double[dos.d] : nullptr), D(dos.D),
+                           w0(dos.w0), w1(dos.w1), one(dos.one), ep(dos.ep)
 {
-  if (T)
+  if (T) 
     std::copy(dos.T, dos.T+dos.d, T);
 }
 
@@ -112,7 +113,6 @@ Dos& Dos::operator= (const Dos &dos)
     return *this;
   this->d = dos.d;
   this->N = dos.N;
-  this->e0 = dos.e0;
 
   if (this->T) delete[] this->T;
   this->T = new double[dos.d];
@@ -121,60 +121,57 @@ Dos& Dos::operator= (const Dos &dos)
   this->D = dos.D;
   this->w0 = dos.w0;
   this->w1 = dos.w1;
-  this->w2 = dos.w2;
   this->ep = dos.ep;
 
   return *this;
 }
 
-void Dos::init(int d_, int N_, double e0_, double t)
+void Dos::init(int d_, int N_, double t)
 {
   d = d_;
   N = N_>>1<<1;
-  e0 = e0_;
   D.resize(N);
   T = new double[d];
   for (int i = 0; i < d; i++)
-    T[i] = 2.0*t*(i+1); // 2t, 4t, 6t, ...
+    T[i] = 2.0*t*(i+1); // 2t, 4t, 6t, ... 
 }
 
 inline void Dos::setDos()
 {
-  double fac = 1./(T[0]*std::pow(Maths::pi,d));
+  double fac = 1./(T[0]*std::pow(pi,d));
   switch (d) {
     case 1: {
       double dE = 2*T[d-1]/(N-1);
-      ep.makeEqDist(N, e0-T[d-1]+dE, e0+T[d-1]-dE);
+      ep.makeEqDist(N, -T[d-1]+dE, T[d-1]-dE);
       #pragma omp parallel for
-      for (int i = 0; i < N; i++) D[i] = fac/sqrt(1.0-Maths::min(one, Maths::sqr((ep[i]-e0)/T[0])));
+      for (int i = 0; i < N; i++) D[i] = fac/sqrt(1.0-Maths::min(one, sqr(ep[i]/T[0])));
       break;
     }
     case 2: {
-      ep.makeEqDist(N, e0-T[d-1], e0+T[d-1]);
+      ep.makeEqDist(N, -T[d-1], T[d-1]);
       #pragma omp parallel for
-      for (int i = 0; i < N; i++) D[i] = fac*Ellip::complete1(Maths::min(one, sqrt(1.0-Maths::sqr((ep[i]-e0)/T[1]))));
+      for (int i = 0; i < N; i++) D[i] = fac*Ellip::complete1(Maths::min(one, sqrt((T[1]-ep[i])*(T[1]+ep[i]))/T[1]));
       break;
     }
     case 3: {
-      ep.makeEqDist(N, e0-T[d-1], e0+T[d-1]);
+      ep.makeEqDist(N, -T[d-1], T[d-1]);
 
       int j = 0;
-      w0 = ep.fInd(e0-T[0], j);
-      w1 = ep.fInd(e0, j);
-      w2 = ep.fInd(e0+T[0], j);
+      w0 = ep.fInd(0.0, j);
+      w1 = ep.fInd(T[0],j)+1;
 
       #pragma omp parallel for
-      for (int i = w1; i <= w2; i++) {
-        Func0 f0(T,one,ep[i]-e0);
-        D[i] = fac*(Maths::integral(0.0, acos((ep[i]-e0)/T[0]), f0, f0.eps) + Maths::integral(acos((ep[i]-e0)/T[0]), Maths::pi, f0, f0.eps));
+      for (int i = w0; i < w1; i++) {
+        Func0 f0(T,one,ep[i]);
+        D[i] = fac*(integral(0.0, acos(ep[i]/T[0]), f0, f0.eps) + integral(acos(ep[i]/T[0]), pi, f0, f0.eps));
       }
       #pragma omp parallel for
-      for (int i = w2+1; i < N; i++) {
-        Func0 f0(T,one,ep[i]-e0);
-        D[i] = fac*Maths::integral(0.0, acos((ep[i]-e0-T[1])/T[0]), f0, f0.eps);
+      for (int i = w1; i < N; i++) {
+        Func0 f0(T,one,ep[i]);
+        D[i] = fac*integral(0.0, acos((ep[i]-T[1])/T[0]), f0, f0.eps);
       }
       #pragma omp parallel for
-      for (int i = 0 ; i < w1; i++) D[i] = D[N-1-i];
+      for (int i = 0 ; i < w0; i++) D[i] = D[N-1-i];
       break;
     }
     default: {
@@ -185,20 +182,20 @@ inline void Dos::setDos()
 
 inline double Dos::RealG0(double om_)
 {
-  double fac = Maths::sgn(om_-e0)/(T[0]*std::pow(Maths::pi,d-1));
-  double om = Maths::abs(om_-e0);
+  double fac = sgn(om_)/(T[0]*std::pow(pi,d-1));
+  double om = abs(om_);
   switch (d) {
     case 1: {
       if (om < T[0])
         return 0.0;
-      return fac/sqrt(Maths::sqr(om/T[0])-one);
+      return fac/sqrt(sqr(om/T[0])-one);
     }
     case 2: {
-      if (om < T[1]) {
-        double l = om/T[1];
+      if (om < T[0]) {
+        double l = om/T[0];
         return fac*Ellip::complete1(Maths::min(one,l));
       } else {
-        double k = T[1]/om;
+        double k = T[0]/om;
         return fac*k*Ellip::complete1(Maths::min(one,k));
       }
     }
@@ -208,12 +205,12 @@ inline double Dos::RealG0(double om_)
       Func3 f3(T,one,om);
       if (om < T[0]) {
         double ac = acos(om/T[0]);
-        return fac*(-Maths::integral(0.0, ac, f2, f2.eps) + Maths::integral(ac, Maths::pi, f1, f1.eps));
+        return fac*(-integral(0.0, ac, f2, f2.eps) + integral(ac, pi, f1, f1.eps));
       } else if (om < T[2]) {
         double ac = acos((om-T[1])/T[0]);
-        return fac*(Maths::integral(0.0, ac, f1, f1.eps) + Maths::integral(ac, Maths::pi, f3, f3.eps));
+        return fac*(integral(0.0, ac, f1, f1.eps) + integral(ac, pi, f3, f3.eps));
       } else {
-        return fac*(Maths::integral(0.0, Maths::pi, f3, f3.eps));
+        return fac*(integral(0.0, pi, f3, f3.eps));
       }
     }
     default: {
@@ -224,31 +221,32 @@ inline double Dos::RealG0(double om_)
 
 inline double Dos::ImagG0(double om_)
 {
-  double om = Maths::abs(om_-e0);
-  double fac = -1./(T[0]*std::pow(Maths::pi,d-1));
+  double om = abs(om_);
+  double fac = -1./(T[0]*std::pow(pi,d-1));
   switch (d) {
     case 1: {
       if (om < T[0])
-        return fac/sqrt(1.0-Maths::min(one, Maths::sqr(om/T[0])));
+        return fac/sqrt(1.0-Maths::min(one, sqr(om/T[0])));
       return 0.0;
     }
     case 2: {
-      if (om < T[1])
+      if (om < T[0])
         return fac*Ellip::complete1(Maths::min(one, sqrt((T[1]-om)*(T[1]+om))/T[1]));
       return 0.0;
     }
     case 3: {
-      if ((ep[w0] < om_ && om_ < ep[w0+1]) || (ep[w2] < om_ && om_ < ep[w2+1])) {
-        Func0 f0(T,one,om);
-        if (om < T[0])
-          return fac*(Maths::integral(0.0, acos(om/T[0]), f0, f0.eps) + Maths::integral(acos(om/T[0]), Maths::pi, f0, f0.eps));
-        else
-          return fac*Maths::integral(0.0, acos((om-T[1])/T[0]), f0, f0.eps);
+      int j0 = w1;
+      if (om <= ep[w1-1])
+        return -pi*D.line(ep.getInterp(om, j0, &M1d::finD));
+      j0 = w1-2;
+      if (om <= T[0])
+        return -pi*D.line(Interp{j0, (om-ep[j0])*ep.d1x(j0)});
+      if (om < ep[w1]) { 
+        double DT0 = D.line(Interp{j0, (T[0]-ep[j0])*ep.d1x(j0)});
+        return -pi*(DT0 - (D[w1]-DT0)*(om-T[0])/(ep[w1]-T[0]));
       }
-      if (om <= T[2]) {
-        int j = 0;
-        return -Maths::pi*D.line(ep.getInterp(om_, j, &M1d::fInd));
-      }
+      if (om <= T[2])
+        return -pi*D.line(ep.getInterp(om, j0, &M1d::fInd));
       return 0.0;
     }
     default: {
@@ -287,12 +285,12 @@ void DMFT::readDos(string inputf)
     int m1 = om.fInd(*max_element(Bmax.begin(),Bmax.end()))+11;
     Dos.resize(Nb, m1-m0+1);
     for (int b = 0; b < Nb; b++) {
-      double h2 = Maths::sqr(Param::eta);
+      double h2 = sqr(Param::eta);
       #pragma omp parallel for
       for (int i = m0; i <= m1; i++) {
         double sum = 0;
         for (int k = 0; k < kSize; k++) {
-          sum += Param::eta/(Maths::sqr(om[i]-ek(b,b)[k]) + h2);
+          sum += Param::eta/(sqr(om[i]-ek(b,b)[k]) + h2);
         }
         Dos(b,i-m0) = sum*weight/pi;
       }

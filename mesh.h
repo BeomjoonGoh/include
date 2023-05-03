@@ -360,6 +360,10 @@ inline void M1d::makeEqLogTan(int N_, double x0, double x1, double x2, double al
   //  3) |x1 ~ x2| : tangent mesh
   // Note: 0.0 is not included.
   int n = N_>>1;
+  if (n == 0) {
+    resize(0);
+    return;
+  }
   makePosEqLogTan(n,x0,x1,x2,alpha);
 
   double *tmp = new double[n];
