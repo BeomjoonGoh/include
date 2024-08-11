@@ -19,6 +19,7 @@ class TightBinding
     int dim;
     std::vector<std::vector<double>> A;
     std::vector<std::vector<double>> B;
+  public:
     std::vector<std::vector<double>> K;
 
   public:
@@ -28,10 +29,13 @@ class TightBinding
     ~TightBinding() { }
 
     TightBinding& operator= (const TightBinding &tb);
-    int size() const { return Hk.size(); }
+    int size() const { return K.size(); }
     void init(const std::vector<std::vector<double>> &A_, int spaceGroup, const std::vector<int> &kmesh);
     void init(const std::vector<std::vector<double>> &A_, const std::vector<std::vector<double>> &kpaths, int nkpath);
-    void computeHk(const std::map<std::vector<int>,std::vector<std::vector<double>>> &hopT, const std::vector<std::vector<double>> &orbitals);
+    bool readhopT(std::string inpfile, int Nb, std::map<std::vector<int>,std::vector<std::vector<compdb>>> &hopT);
+    bool readWannier(std::string inpfile, std::map<std::vector<int>,std::vector<std::vector<compdb>>> &hopT);
+    template <typename T>
+    void computeHk(const std::map<std::vector<int>,std::vector<std::vector<T>>> &hopT, const std::vector<std::vector<double>> &orbitals);
 
   private:
     void genReciprocal();
@@ -200,7 +204,68 @@ void TightBinding::genKpaths(const std::vector<std::vector<double>> &kpaths, int
   std::clog << std::endl;
 }
 
-void TightBinding::computeHk(const std::map<std::vector<int>,std::vector<std::vector<double>>> &hopT, const std::vector<std::vector<double>> &orbitals)
+bool TightBinding::readhopT(std::string inpfile, int Nb, std::map<std::vector<int>,std::vector<std::vector<compdb>>> &hopT)
+{
+  std::clog << "Reading hopping parameter matrix from '" << inpfile << "'\n";
+  std::ifstream inf(inpfile);
+  std::vector<int> key(dim);
+  std::vector<std::vector<compdb>> val;
+  val.resize(Nb);
+  for (auto &v : val)
+    v.resize(Nb);
+
+  int counter = 0;
+  int m,n;
+  while (!(inf>>std::ws).eof()) {
+    for (auto &k : key)
+      inf >> k;
+    inf >> m >> n >> val[m][n];
+    counter++;
+    if (counter == Maths::sqr(Nb)) {
+      hopT[key] = val;
+      counter = 0;
+    }
+  }
+  return true;
+}
+
+bool TightBinding::readWannier(std::string inpfile, std::map<std::vector<int>,std::vector<std::vector<compdb>>> &hopT)
+{
+  std::ifstream inf(inpfile);
+  std::string datetime;
+  std::getline(inf,datetime,'\n');
+  int Nb = 0;
+  int Nc = 0;
+  inf >> Nb >> Nc;
+  std::clog << "Reading Wannier90 Hamiltonian from '" << inpfile << "':" << datetime << '\n'
+            << "Number of Wannier orbitals = " << Nb << '\n'
+            << "Number of Wigner-Seitz grid-points = " << Nc << '\n';
+
+  std::vector<double> deg(Nc);
+  for (auto &d : deg)
+    inf >> d;
+  std::vector<int> key(dim);
+  std::vector<std::vector<compdb>> val;
+  val.resize(Nb);
+  for (auto &v : val)
+    v.resize(Nb);
+  int dum = 0;
+  for (int i = 0; i < Nc; i++) {
+    for (int m = 0; m < Nb; m++) {
+      for (int n = 0; n < Nb; n++) {
+        for (auto &k : key)
+          inf >> k;
+        inf >> dum >> dum >> val[m][n];
+        val[m][n] /= deg[i];
+      }
+    }
+    hopT[key] = val;
+  }
+  return (inf>>std::ws).eof();
+}
+
+template <typename T>
+void TightBinding::computeHk(const std::map<std::vector<int>,std::vector<std::vector<T>>> &hopT, const std::vector<std::vector<double>> &orbitals)
 {
   int Nb = orbitals.size();
   Hk.resize(K.size());
@@ -225,16 +290,6 @@ void TightBinding::computeHk(const std::map<std::vector<int>,std::vector<std::ve
             kr += K[k][i]*r;
           }
           ekbc += t.second[b][c]*compdb(std::cos(kr),-std::sin(kr));
-
-          //double kr_p = 0.0, kr_m = 0.0;
-          //for (int i = 0; i < dim; i++) {
-          //  for (int j = 0; j < dim; j++) {
-          //    kr_p += (+t.first[i]+orbitals[b][i]-orbitals[c][i])*A[i][j]*K[k][j];
-          //    kr_m += (-t.first[i]+orbitals[b][i]-orbitals[c][i])*A[i][j]*K[k][j];
-          //  }
-          //}
-          //Hk[k](b,c) += t.second[b][c]*compdb{std::cos(kr_p),-std::sin(kr_p)}
-          //              +t.second[c][b]*compdb{std::cos(kr_m),-std::sin(kr_m)};
         }
         Hk[k](b,c) = ekbc;
       }
