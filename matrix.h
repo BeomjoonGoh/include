@@ -41,6 +41,8 @@ class Mat
     void inverse(Mat<T> &Ainv) const;
     void inverse();
     void eigen(Mat<T> &QT, double* E) const;
+    template <typename compdb>
+    void geigen(Mat<T> &B, Mat<T> &VT, compdb *E);
 };
 
 template <typename T>
@@ -249,7 +251,7 @@ inline void Mat<double>::eigen(Mat<double> &QT, double* E) const
   LAPACK::dsyev_(&JOBZ, &UPLO, &N_, QT.m, &N_, E, WORK, &LWORK, &INFO);
 
   delete[] WORK;
-  assert(INFO == 0, "Error: dgeev returned error code " << INFO);
+  if (INFO) std::cerr << "dsyev Error: INFO = " << INFO << std::endl;
 }
 
 template <typename T>
@@ -268,7 +270,35 @@ inline void Mat<T>::eigen(Mat<T> &QT, double* E) const
 
   delete[] WORK;
   delete[] RWORK;
-  assert(INFO == 0, "Error: zheev returned error code " << INFO);
+  if (INFO) std::cerr << "zheev Error: INFO = " << INFO << std::endl;
 }
+
+template <>
+template <typename compdb>
+void Mat<double>::geigen(Mat<double> &B, Mat<double> &VT, compdb *E)
+{
+  char JOBVL = 'N';
+  char JOBVR = 'V';
+  int LWORK = 8*N+16;
+  int INFO;
+  double VL;
+  
+  double *ALPHAR = new double[N];
+  double *ALPHAI = new double[N];
+  double *BETA = new double[N];
+  double *WORK = new double[LWORK];
+
+  LAPACK::dggev_(&JOBVL, &JOBVR, &N, m, &N, B.m, &N, ALPHAR, ALPHAI, BETA, &VL, &N, VT.m, &N, WORK, &LWORK, &INFO);
+  if (INFO) std::cerr << "dggev Error: INFO = " << INFO << std::endl;
+
+  for (int i = 0; i < N; i++)
+    E[i] = compdb(ALPHAR[i],ALPHAI[i])/BETA[i];
+
+  delete[] ALPHAR;
+  delete[] ALPHAI;
+  delete[] BETA;
+  delete[] WORK;
+}
+
 
 #endif /* end of include guard: MATRIX_H */
