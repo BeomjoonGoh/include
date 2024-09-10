@@ -10,8 +10,6 @@
 #include "specialfunctions/elliptic.h"
 #include "derule.h"
 
-#include <omp.h>
-
 class Dos
 { // Non interacting density of states of simple cupic lattice for 1, 2, and 3 dimension.
   // E. N. Economou, Green's Functions in Quantum Physics, 3rd Ed., (Springer, 2006), p. 87.

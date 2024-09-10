@@ -8,6 +8,9 @@
 template <typename T> std::vector<T> operator+(const std::vector<T> &v, const std::vector<T> &w);
 template <typename T> std::vector<T> operator+(const std::vector<T> &v, T a);
 template <typename T> std::vector<T> operator+(T a, const std::vector<T> &v);
+template <typename T> std::vector<T> operator-(const std::vector<T> &v, const std::vector<T> &w);
+template <typename T> std::vector<T> operator-(const std::vector<T> &v, T a);
+template <typename T> std::vector<T> operator-(T a, const std::vector<T> &v);
 template <typename T> std::vector<T> operator*(const std::vector<T> &v, const std::vector<T> &w);
 template <typename T> std::vector<T> operator*(const std::vector<T> &v, T a);
 template <typename T> std::vector<T> operator*(T a, const std::vector<T> &v);
@@ -36,6 +39,31 @@ template <typename T> std::vector<T> operator+(const std::vector<T> &v, T a)
 }
 
 template <typename T> std::vector<T> operator+(T a, const std::vector<T> &v) { return v + a; }
+
+template <typename T> std::vector<T> operator-(const std::vector<T> &v, const std::vector<T> &w)
+{
+  assert0(v.size() == w.size());
+  std::vector<T> vec {v};
+  for (int i = 0; i < v.size(); i++)
+    vec[i] -= w[i];
+  return vec;
+}
+
+template <typename T> std::vector<T> operator-(const std::vector<T> &v, T a)
+{
+  std::vector<T> vec {v};
+  for (auto &i : vec)
+    i -= a;
+  return vec;
+}
+
+template <typename T> std::vector<T> operator-(T a, const std::vector<T> &v)
+{
+  std::vector<T> vec {v};
+  for (auto &i : vec)
+    i = a-i;
+  return vec;
+}
 
 template <typename T> std::vector<T> operator*(const std::vector<T> &v, const std::vector<T> &w)
 {
