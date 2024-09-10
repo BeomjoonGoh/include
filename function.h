@@ -100,6 +100,7 @@ class F2d
     int Nd;             // number of elements
     int N;              // number of elements
     F1d<T> *v;          // functions
+    const size_t OFF = 16;
 
   public:
     F2d() : mem{nullptr}, Nd{0}, N{0}, v{nullptr} { }
@@ -721,7 +722,7 @@ inline F2d<T>::F2d(int Nd_, int N_)
   Nd = Nd_;
   N = N_;
 
-  int offset = sizeof(F1d<T>)*Nd+8;
+  int offset = sizeof(F1d<T>)*Nd+OFF;
   mem = operator new(sizeof(T)*Nd*N + offset);
   v = new(mem) F1d<T>[Nd];
   T* begins = reinterpret_cast<T*>(static_cast<char*>(mem)+offset);
@@ -737,7 +738,7 @@ inline F2d<T>::F2d(int Nd_, int N_, T vi)
   Nd = Nd_;
   N = N_;
 
-  int offset = sizeof(F1d<T>)*Nd+8;
+  int offset = sizeof(F1d<T>)*Nd+OFF;
   mem = operator new(sizeof(T)*Nd*N + offset);
   v = new(mem) F1d<T>[Nd];
   T* begins = reinterpret_cast<T*>(static_cast<char*>(mem)+offset);
@@ -757,7 +758,7 @@ inline F2d<T>::F2d(int Nd_, const F1d<T> &f)
   Nd = Nd_;
   N = f.size();
 
-  int offset = sizeof(F1d<T>)*Nd+8;
+  int offset = sizeof(F1d<T>)*Nd+OFF;
   mem = operator new(sizeof(T)*Nd*N + offset);
   v = new(mem) F1d<T>[Nd];
   T* begins = reinterpret_cast<T*>(static_cast<char*>(mem)+offset);
@@ -776,7 +777,7 @@ inline F2d<T>::F2d(const F2d<T> &F)
   Nd = F.Nd;
   N = F.N;
 
-  int offset = sizeof(F1d<T>)*Nd+8;
+  int offset = sizeof(F1d<T>)*Nd+OFF;
   mem = operator new(sizeof(T)*Nd*N + offset);
   memcpy(mem, F.mem, sizeof(T)*Nd*N + offset);
 
@@ -796,7 +797,7 @@ inline F2d<T>& F2d<T>::operator= (const F2d<T> &F)
     Nd = F.Nd;
     N = F.N;
 
-    int offset = sizeof(F1d<T>)*Nd+8;
+    int offset = sizeof(F1d<T>)*Nd+OFF;
     operator delete(mem);
     mem = operator new(sizeof(T)*Nd*N + offset);
     memcpy(mem, F.mem, sizeof(T)*Nd*N + offset);
@@ -1152,7 +1153,7 @@ inline void F2d<T>::resize(int Nd_, int N_)
     Nd = Nd_;
     N = N_;
 
-    int offset = sizeof(F1d<T>)*Nd+8;
+    int offset = sizeof(F1d<T>)*Nd+OFF;
     mem = operator new(sizeof(T)*Nd*N + offset);
     v = new(mem) F1d<T>[Nd];
 
