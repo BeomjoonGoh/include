@@ -97,6 +97,9 @@ template <typename T>
 inline void Mat<T>::inverse(Mat<T> &Ainv) const
 {
   switch (N) {
+    case 0: {
+      break;
+    }
     case 1: {
       Ainv.m[0] = 1./m[0];
       break;
@@ -168,6 +171,9 @@ template <typename T>
 inline void Mat<T>::inverse()
 {
   switch (N) { 
+    case 0: {
+      break;
+    }
     case 1: {
       m[0] = 1./m[0];
       break;
